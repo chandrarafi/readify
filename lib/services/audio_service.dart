@@ -81,6 +81,27 @@ class AudioService {
     }
   }
 
+  // Play letter sound A-Z
+  Future<void> playLetterSound(int index) async {
+    if (!_initialized) return;
+    try {
+      final letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+      if (index >= 0 && index < letters.length) {
+        final player = AudioPlayer();
+        await player.setAsset('assets/AudioClip/${letters[index]}.wav');
+        await player.play();
+        // Dispose after playing
+        player.playerStateStream.listen((state) {
+          if (state.processingState == ProcessingState.completed) {
+            player.dispose();
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint('Error play letter sound: $e');
+    }
+  }
+
   void dispose() {
     _bgmPlayer?.dispose();
     _sfxPlayer?.dispose();
