@@ -62,6 +62,7 @@ flutter:
     - assets/untukhome/
     - assets/untukisinama/
     - assets/untukmenu/
+    - assets/untukbelajar/alfabet/
     - assets/musik.mp3
 
   fonts:

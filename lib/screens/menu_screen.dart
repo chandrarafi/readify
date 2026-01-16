@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/audio_service.dart';
+import 'alfabet_screen.dart';
 
 class MenuScreen extends StatefulWidget {
   final String userName;
@@ -332,6 +333,26 @@ class _MenuScreenState extends State<MenuScreen>
     );
   }
 
+  void _navigateToAlfabet() async {
+    // Reverse entry animation for exit effect
+    await _entryController.reverse();
+    if (mounted) {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => const AlfabetScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      ).then((_) {
+        // Re-animate entry when coming back
+        _entryController.forward();
+      });
+    }
+  }
+
   void _showBelajarSubmenu(BuildContext context, double screenWidth, double screenHeight) {
     showGeneralDialog(
       context: context,
@@ -384,7 +405,7 @@ class _MenuScreenState extends State<MenuScreen>
                         child: _buildSubmenuButton(
                           isPressed: _isAlfabetPressed,
                           onPressChanged: (v) => setState(() => _isAlfabetPressed = v),
-                          onTap: () { Navigator.pop(context); _showComingSoon('Alfabet'); },
+                          onTap: () { Navigator.pop(context); _navigateToAlfabet(); },
                           text: 'Alfabet',
                           screenHeight: screenHeight,
                           screenWidth: screenWidth,
