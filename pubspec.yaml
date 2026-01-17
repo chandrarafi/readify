@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   just_audio: ^0.9.40
   shared_preferences: ^2.2.2
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
@@ -59,10 +60,13 @@ flutter:
     - assets/Sprite/
     - assets/Texture2D/
     - assets/AudioClip/
+    - assets/AudioClip/kosakata/
+    - assets/AudioClip/sukukata/
     - assets/untukhome/
     - assets/untukisinama/
     - assets/untukmenu/
     - assets/untukbelajar/alfabet/
+    - assets/untukbelajar/kosakata/
     - assets/musik.mp3
 
   fonts:
@@ -80,3 +84,21 @@ flutter:
       fonts:
         - asset: assets/Font/Oswald-Bold.ttf
           weight: 700
+    - family: Dimbo
+      fonts:
+        - asset: assets/Font/DIMBO ITALIC.ttf
+    - family: KGBlank
+      fonts:
+        - asset: assets/Font/KGBLANKSPACESOLID.ttf
+    - family: SpicySale
+      fonts:
+        - asset: assets/Font/SpicySale.ttf
+    - family: SuperMeatball
+      fonts:
+        - asset: assets/Font/SuperMeatball.ttf
+    - family: SpicySale
+      fonts:
+        - asset: assets/Font/SpicySale.ttf
+    - family: CandyPlanet
+      fonts:
+        - asset: assets/Font/CandyPlanet.ttf
