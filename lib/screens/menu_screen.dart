@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../services/audio_service.dart';
 import 'alfabet_screen.dart';
+import 'kosakata_screen.dart';
+import 'tebak_kata_screen.dart';
+import 'history_screen.dart';
+import 'petunjuk_screen.dart';
 
 class MenuScreen extends StatefulWidget {
   final String userName;
@@ -33,6 +37,7 @@ class _MenuScreenState extends State<MenuScreen>
   bool _isPetunjukPressed = false;
   bool _isBelajarPressed = false;
   bool _isLatihanPressed = false;
+  bool _isHistoriPressed = false;
   bool _isInformasiPressed = false;
   bool _isExitPressed = false;
   bool _isAlfabetPressed = false;
@@ -165,7 +170,15 @@ class _MenuScreenState extends State<MenuScreen>
                       _buildMenuButton(
                         isPressed: _isPetunjukPressed,
                         onPressChanged: (v) => setState(() => _isPetunjukPressed = v),
-                        onTap: () => _showComingSoon('Petunjuk Penggunaan'),
+                        onTap: () {
+                          _audio.playButtonSound();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const PetunjukScreen(),
+                            ),
+                          );
+                        },
                         text: 'petunjuk\npenggunaan',
                         screenHeight: screenHeight,
                         screenWidth: screenWidth,
@@ -183,8 +196,33 @@ class _MenuScreenState extends State<MenuScreen>
                       _buildMenuButton(
                         isPressed: _isLatihanPressed,
                         onPressChanged: (v) => setState(() => _isLatihanPressed = v),
-                        onTap: () => _showComingSoon('Latihan'),
+                        onTap: () {
+                          _audio.playButtonSound();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const TebakKataScreen(),
+                            ),
+                          );
+                        },
                         text: 'Latihan',
+                        screenHeight: screenHeight,
+                        screenWidth: screenWidth,
+                      ),
+                      SizedBox(height: screenHeight * 0.035),
+                      _buildMenuButton(
+                        isPressed: _isHistoriPressed,
+                        onPressChanged: (v) => setState(() => _isHistoriPressed = v),
+                        onTap: () {
+                          _audio.playButtonSound();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HistoryScreen(),
+                            ),
+                          );
+                        },
+                        text: 'Histori',
                         screenHeight: screenHeight,
                         screenWidth: screenWidth,
                       ),
@@ -353,6 +391,26 @@ class _MenuScreenState extends State<MenuScreen>
     }
   }
 
+  void _navigateToKosaKata() async {
+    // Reverse entry animation for exit effect
+    await _entryController.reverse();
+    if (mounted) {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => const KosaKataScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      ).then((_) {
+        // Re-animate entry when coming back
+        _entryController.forward();
+      });
+    }
+  }
+
   void _showBelajarSubmenu(BuildContext context, double screenWidth, double screenHeight) {
     showGeneralDialog(
       context: context,
@@ -426,7 +484,7 @@ class _MenuScreenState extends State<MenuScreen>
                         child: _buildSubmenuButton(
                           isPressed: _isKosaKataPressed,
                           onPressChanged: (v) => setState(() => _isKosaKataPressed = v),
-                          onTap: () { Navigator.pop(context); _showComingSoon('Kosa Kata'); },
+                          onTap: () { Navigator.pop(context); _navigateToKosaKata(); },
                           text: 'Kosa Kata',
                           screenHeight: screenHeight,
                           screenWidth: screenWidth,
