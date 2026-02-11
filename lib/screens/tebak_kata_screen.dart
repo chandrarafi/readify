@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 import '../services/audio_service.dart';
 import '../services/score_service.dart';
 import '../models/score_history.dart';
@@ -586,7 +585,7 @@ class _TebakKataScreenState extends State<TebakKataScreen>
                 ),
               ),
           ],
-        ),x
+        ),
       ),
     );
   }

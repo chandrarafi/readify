@@ -285,7 +285,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '$feature - Segera Hadir! 🚀',
+          '$feature - Segera Hadir! ',
           style: const TextStyle(fontFamily: 'Roboto', fontSize: 16),
         ),
         backgroundColor: const Color(0xFF2196F3),
