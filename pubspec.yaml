@@ -67,6 +67,7 @@ flutter:
     - assets/untukmenu/
     - assets/untukbelajar/alfabet/
     - assets/untukbelajar/kosakata/
+    - assets/petunjuk/
     - assets/musik.mp3
 
   fonts:

@@ -170,15 +170,7 @@ class _MenuScreenState extends State<MenuScreen>
                       _buildMenuButton(
                         isPressed: _isPetunjukPressed,
                         onPressChanged: (v) => setState(() => _isPetunjukPressed = v),
-                        onTap: () {
-                          _audio.playButtonSound();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const PetunjukScreen(),
-                            ),
-                          );
-                        },
+                        onTap: () => _showComingSoon('Petunjuk Penggunaan'),
                         text: 'petunjuk\npenggunaan',
                         screenHeight: screenHeight,
                         screenWidth: screenWidth,
@@ -362,7 +354,7 @@ class _MenuScreenState extends State<MenuScreen>
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$feature - Segera Hadir! 🚀', style: const TextStyle(fontFamily: 'Bangers', fontSize: 16)),
+        content: Text('$feature - Segera Hadir!', style: const TextStyle(fontFamily: 'Bangers', fontSize: 16)),
         backgroundColor: const Color(0xFF2196F3),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

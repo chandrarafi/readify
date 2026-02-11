@@ -307,9 +307,9 @@ class _KosaKataScreenState extends State<KosaKataScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _build3DCategoryTab('Dua Suku', 0, Colors.green, screenWidth, screenHeight),
+                    _build3DCategoryTab('kv-kv', 0, Colors.green, screenWidth, screenHeight),
                     SizedBox(width: screenWidth * 0.03),
-                    _build3DCategoryTab('Konsonan Akhir', 1, Colors.purple, screenWidth, screenHeight),
+                    _build3DCategoryTab('kv-kvk', 1, Colors.purple, screenWidth, screenHeight),
                   ],
                 ),
               ),
