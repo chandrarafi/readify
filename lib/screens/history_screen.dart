@@ -11,7 +11,7 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final _audio = AudioService();
   final _scoreService = ScoreService();
   
@@ -20,15 +20,21 @@ class _HistoryScreenState extends State<HistoryScreen>
 
   late AnimationController _entryController;
   late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
+
+  late AnimationController _cloud1Controller;
+  late AnimationController _cloud2Controller;
+  late AnimationController _bounceController;
+  late Animation<double> _bounceAnimation;
 
   @override
   void initState() {
     super.initState();
-    _initAnimation();
+    _initAnimations();
     _loadData();
   }
 
-  void _initAnimation() {
+  void _initAnimations() {
     _entryController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -36,14 +42,34 @@ class _HistoryScreenState extends State<HistoryScreen>
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _entryController, curve: Curves.easeOut),
     );
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _entryController, curve: Curves.easeOutBack),
+    );
+
+    _cloud1Controller = AnimationController(
+      duration: const Duration(seconds: 30),
+      vsync: this,
+    )..repeat();
+    _cloud2Controller = AnimationController(
+      duration: const Duration(seconds: 45),
+      vsync: this,
+    )..repeat();
+
+    _bounceController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+    _bounceAnimation = Tween<double>(begin: -3.0, end: 3.0).animate(
+      CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut),
+    );
+
     _entryController.forward();
   }
 
   Future<void> _loadData() async {
     final history = await _scoreService.getHistory();
-    
     setState(() {
-      _history = history.take(10).toList(); // Ambil 10 terakhir saja
+      _history = history.take(5).toList(); // Hanya 5 terakhir agar muat
       _isLoading = false;
     });
   }
@@ -51,26 +77,27 @@ class _HistoryScreenState extends State<HistoryScreen>
   @override
   void dispose() {
     _entryController.dispose();
+    _cloud1Controller.dispose();
+    _cloud2Controller.dispose();
+    _bounceController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final sw = MediaQuery.of(context).size.width;
+    final sh = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      body: Container(
-        width: screenWidth,
-        height: screenHeight,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/untukhome/bg.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
+      body: SizedBox(
+        width: sw,
+        height: sh,
         child: Stack(
           children: [
+            // Background
+            Positioned.fill(
+              child: Image.asset('assets/untukhome/bg.png', fit: BoxFit.cover),
+            ),
             // Ground
             Positioned(
               bottom: 0,
@@ -79,14 +106,48 @@ class _HistoryScreenState extends State<HistoryScreen>
               child: Image.asset(
                 'assets/untukhome/ground.png',
                 fit: BoxFit.cover,
-                height: screenHeight * 0.18,
+                height: sh * 0.18,
               ),
+            ),
+
+            // Animated clouds
+            AnimatedBuilder(
+              animation: _cloud1Controller,
+              builder: (context, child) {
+                return Positioned(
+                  top: sh * 0.05,
+                  left: sw * (_cloud1Controller.value * 1.5 - 0.3),
+                  child: Opacity(
+                    opacity: 0.9,
+                    child: Image.asset(
+                      'assets/untukbelajar/alfabet/awan 1.png',
+                      height: sh * 0.1,
+                    ),
+                  ),
+                );
+              },
+            ),
+            AnimatedBuilder(
+              animation: _cloud2Controller,
+              builder: (context, child) {
+                return Positioned(
+                  top: sh * 0.12,
+                  left: sw * (_cloud2Controller.value * 1.5 - 0.2),
+                  child: Opacity(
+                    opacity: 0.8,
+                    child: Image.asset(
+                      'assets/untukbelajar/alfabet/awan 2.png',
+                      height: sh * 0.08,
+                    ),
+                  ),
+                );
+              },
             ),
 
             // Back button
             Positioned(
-              top: screenHeight * 0.03,
-              left: screenWidth * 0.02,
+              top: sh * 0.03,
+              left: sw * 0.02,
               child: FadeTransition(
                 opacity: _fadeAnimation,
                 child: GestureDetector(
@@ -96,7 +157,7 @@ class _HistoryScreenState extends State<HistoryScreen>
                   },
                   child: Image.asset(
                     'assets/untukbelajar/alfabet/navigasi_0.png',
-                    height: screenHeight * 0.1,
+                    height: sh * 0.1,
                   ),
                 ),
               ),
@@ -104,7 +165,7 @@ class _HistoryScreenState extends State<HistoryScreen>
 
             // Title
             Positioned(
-              top: screenHeight * 0.03,
+              top: sh * 0.03,
               left: 0,
               right: 0,
               child: FadeTransition(
@@ -112,14 +173,14 @@ class _HistoryScreenState extends State<HistoryScreen>
                 child: Center(
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth * 0.06,
-                      vertical: screenHeight * 0.015,
+                      horizontal: sw * 0.05,
+                      vertical: sh * 0.012,
                     ),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [Colors.purple.shade400, Colors.pink.shade400],
                       ),
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: Colors.white, width: 3),
                       boxShadow: [
                         BoxShadow(
@@ -127,252 +188,262 @@ class _HistoryScreenState extends State<HistoryScreen>
                           offset: const Offset(0, 4),
                           blurRadius: 0,
                         ),
-                        BoxShadow(
-                          color: Colors.black26,
-                          offset: const Offset(0, 6),
-                          blurRadius: 8,
-                        ),
                       ],
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.star,
-                          color: Colors.yellow,
-                          size: screenHeight * 0.04,
-                        ),
-                        SizedBox(width: screenWidth * 0.02),
-                        Text(
-                          'Nilai Kamu',
-                          style: TextStyle(
-                            fontFamily: 'SpicySale',
-                            fontSize: screenHeight * 0.04,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(width: screenWidth * 0.02),
-                        Icon(
-                          Icons.star,
-                          color: Colors.yellow,
-                          size: screenHeight * 0.04,
-                        ),
-                      ],
+                    child: Text(
+                      '⭐ Nilai Kamu ⭐',
+                      style: TextStyle(
+                        fontFamily: 'SpicySale',
+                        fontSize: sh * 0.035,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
 
-            // Content
+            // Main papan content
             Positioned(
-              top: screenHeight * 0.15,
+              top: sh * 0.13,
               left: 0,
               right: 0,
-              bottom: screenHeight * 0.2,
+              bottom: sh * 0.12,
               child: FadeTransition(
                 opacity: _fadeAnimation,
-                child: _isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                        ),
-                      )
-                    : _history.isEmpty
-                        ? _buildEmptyState(screenWidth, screenHeight)
-                        : _buildHistoryList(screenWidth, screenHeight),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState(double screenWidth, double screenHeight) {
-    return Center(
-      child: Container(
-        padding: EdgeInsets.all(screenWidth * 0.08),
-        margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              offset: const Offset(0, 4),
-              blurRadius: 8,
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '😊',
-              style: TextStyle(fontSize: screenHeight * 0.1),
-            ),
-            SizedBox(height: screenHeight * 0.02),
-            Text(
-              'Belum Ada Nilai',
-              style: TextStyle(
-                fontFamily: 'SpicySale',
-                fontSize: screenHeight * 0.035,
-                color: Colors.brown.shade800,
-              ),
-            ),
-            SizedBox(height: screenHeight * 0.01),
-            Text(
-              'Ayo main latihan dulu!',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: screenHeight * 0.022,
-                color: Colors.grey.shade600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHistoryList(double screenWidth, double screenHeight) {
-    return ListView.builder(
-      padding: EdgeInsets.symmetric(
-        horizontal: screenWidth * 0.05,
-        vertical: screenHeight * 0.02,
-      ),
-      itemCount: _history.length,
-      itemBuilder: (context, index) {
-        return _buildHistoryCard(
-          _history[index],
-          index,
-          screenWidth,
-          screenHeight,
-        );
-      },
-    );
-  }
-
-  Widget _buildHistoryCard(
-    ScoreHistory item,
-    int index,
-    double screenWidth,
-    double screenHeight,
-  ) {
-    final percentage = item.percentage;
-    
-    // Emoji dan warna berdasarkan nilai
-    String emoji;
-    Color cardColor;
-    String message;
-    
-    if (percentage >= 80) {
-      emoji = '🌟';
-      cardColor = Colors.green;
-      message = 'Hebat!';
-    } else if (percentage >= 60) {
-      emoji = '😊';
-      cardColor = Colors.blue;
-      message = 'Bagus!';
-    } else {
-      emoji = '💪';
-      cardColor = Colors.orange;
-      message = 'Semangat!';
-    }
-
-    return Container(
-      margin: EdgeInsets.only(bottom: screenHeight * 0.02),
-      child: Stack(
-        children: [
-          // Shadow
-          Positioned(
-            top: 6,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: screenHeight * 0.12,
-              decoration: BoxDecoration(
-                color: cardColor.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-          ),
-          // Card
-          Container(
-            padding: EdgeInsets.all(screenWidth * 0.04),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  cardColor.withValues(alpha: 0.9),
-                  cardColor,
-                ],
-              ),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white, width: 3),
-            ),
-            child: Row(
-              children: [
-                // Emoji besar
-                Text(
-                  emoji,
-                  style: TextStyle(fontSize: screenHeight * 0.06),
-                ),
-                SizedBox(width: screenWidth * 0.04),
-                
-                // Info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        message,
-                        style: TextStyle(
-                          fontFamily: 'SpicySale',
-                          fontSize: screenHeight * 0.03,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: screenHeight * 0.005),
-                      Text(
-                        '${item.score} dari ${item.totalQuestions} benar',
-                        style: TextStyle(
-                          fontSize: screenHeight * 0.022,
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                // Score besar
-                Container(
-                  padding: EdgeInsets.all(screenWidth * 0.03),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        offset: const Offset(0, 2),
-                        blurRadius: 4,
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    '$percentage',
-                    style: TextStyle(
-                      fontFamily: 'SpicySale',
-                      fontSize: screenHeight * 0.035,
-                      color: cardColor,
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: AnimatedBuilder(
+                    animation: _bounceAnimation,
+                    builder: (context, child) {
+                      return Transform.translate(
+                        offset: Offset(0, _bounceAnimation.value),
+                        child: child,
+                      );
+                    },
+                    child: Center(
+                      child: _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : _buildPapanContent(sw, sh),
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPapanContent(double sw, double sh) {
+    return SizedBox(
+      width: sw * 0.8,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Papan background
+          Image.asset(
+            'assets/untukbelajar/alfabet/papan.png',
+            width: sw * 0.8,
+            fit: BoxFit.contain,
+          ),
+          // Content
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: sw * 0.07,
+              vertical: sh * 0.025,
+            ),
+            child: _history.isEmpty
+                ? _buildEmptyContent(sw, sh)
+                : _buildHistoryTable(sw, sh),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildEmptyContent(double sw, double sh) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('📚', style: TextStyle(fontSize: sh * 0.07)),
+        SizedBox(height: sh * 0.01),
+        Text(
+          'Belum Ada Nilai',
+          style: TextStyle(
+            fontFamily: 'SpicySale',
+            fontSize: sh * 0.03,
+            color: Colors.brown.shade800,
+          ),
+        ),
+        Text(
+          'Ayo main latihan dulu!',
+          style: TextStyle(
+            fontFamily: 'SpicySale',
+            fontSize: sh * 0.018,
+            color: Colors.brown.shade500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHistoryTable(double sw, double sh) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Header row
+        Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: sw * 0.02,
+            vertical: sh * 0.006,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.brown.shade700,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              SizedBox(
+                width: sw * 0.06,
+                child: Text(
+                  'No',
+                  style: _headerStyle(sh),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Expanded(
+                flex: 3,
+                child: Text('Latihan', style: _headerStyle(sh)),
+              ),
+              Expanded(
+                flex: 2,
+                child: Text(
+                  'Skor',
+                  style: _headerStyle(sh),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              SizedBox(
+                width: sw * 0.1,
+                child: Text(
+                  '⭐',
+                  style: _headerStyle(sh),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: sh * 0.006),
+        // Data rows
+        ...List.generate(_history.length, (i) {
+          return _buildRow(_history[i], i, sw, sh);
+        }),
+      ],
+    );
+  }
+
+  Widget _buildRow(ScoreHistory item, int index, double sw, double sh) {
+    final percentage = item.percentage;
+    final stars = percentage >= 80 ? 3 : percentage >= 60 ? 2 : percentage >= 30 ? 1 : 0;
+    final rowColor = index.isEven
+        ? Colors.brown.shade100.withValues(alpha: 0.4)
+        : Colors.brown.shade200.withValues(alpha: 0.3);
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: Duration(milliseconds: 400 + (index * 100)),
+      curve: Curves.easeOut,
+      builder: (context, value, child) {
+        return Opacity(opacity: value, child: child);
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: sw * 0.02,
+          vertical: sh * 0.008,
+        ),
+        decoration: BoxDecoration(
+          color: rowColor,
+          borderRadius: BorderRadius.circular(6),
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.brown.shade300.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+        ),
+        child: Row(
+          children: [
+            // Number
+            SizedBox(
+              width: sw * 0.06,
+              child: Text(
+                '${index + 1}',
+                style: TextStyle(
+                  fontFamily: 'SpicySale',
+                  fontSize: sh * 0.02,
+                  color: Colors.brown.shade800,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            // Category
+            Expanded(
+              flex: 3,
+              child: Text(
+                item.category,
+                style: TextStyle(
+                  fontFamily: 'SpicySale',
+                  fontSize: sh * 0.017,
+                  color: Colors.brown.shade700,
+                ),
+              ),
+            ),
+            // Score
+            Expanded(
+              flex: 2,
+              child: Text(
+                '${item.score}/${item.totalQuestions}',
+                style: TextStyle(
+                  fontFamily: 'SpicySale',
+                  fontSize: sh * 0.02,
+                  color: percentage >= 80
+                      ? Colors.green.shade700
+                      : percentage >= 60
+                          ? Colors.blue.shade700
+                          : Colors.orange.shade700,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            // Stars
+            SizedBox(
+              width: sw * 0.1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(3, (i) {
+                  return Icon(
+                    i < stars ? Icons.star_rounded : Icons.star_border_rounded,
+                    color: i < stars ? Colors.amber : Colors.brown.shade300,
+                    size: sh * 0.02,
+                  );
+                }),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  TextStyle _headerStyle(double sh) {
+    return TextStyle(
+      fontFamily: 'SpicySale',
+      fontSize: sh * 0.016,
+      color: Colors.white,
     );
   }
 }

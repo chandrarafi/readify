@@ -94,6 +94,7 @@ class _TebakKataScreenState extends State<TebakKataScreen>
   @override
   void initState() {
     super.initState();
+    _soalList.shuffle(); // Acak soal saat mulai
     _initAnimations();
     // Play audio soal pertama setelah animasi selesai
     Future.delayed(const Duration(milliseconds: 1000), () {
@@ -187,10 +188,9 @@ class _TebakKataScreenState extends State<TebakKataScreen>
     // Play audio jawaban (benar atau salah)
     Future.delayed(const Duration(milliseconds: 300), () {
       if (_isCorrect) {
-        _audio.playWordSound(_currentSoal['jawaban']);
+        _audio.playCorrectSound();
       } else {
-        // Play audio untuk jawaban yang salah bisa pakai sound effect
-        _audio.playButtonSound();
+        _audio.playWrongSound();
       }
     });
 
@@ -238,6 +238,7 @@ class _TebakKataScreenState extends State<TebakKataScreen>
 
   void _restart() {
     setState(() {
+      _soalList.shuffle(); // Acak soal saat restart
       _currentIndex = 0;
       _selectedAnswer = null;
       _showResult = false;
@@ -668,120 +669,184 @@ class _TebakKataScreenState extends State<TebakKataScreen>
 
   Widget _buildFinishScreen(double screenWidth, double screenHeight) {
     final percentage = (_score / _soalList.length * 100).round();
-    String message;
-    Color messageColor;
-
-    if (percentage >= 80) {
-      message = 'Luar Biasa!';
-      messageColor = Colors.green;
-    } else if (percentage >= 60) {
-      message = 'Bagus!';
-      messageColor = Colors.blue;
-    } else {
-      message = 'Coba Lagi!';
-      messageColor = Colors.orange;
-    }
+    final stars = _score >= 8
+        ? 3
+        : _score >= 5
+            ? 2
+            : _score >= 3
+                ? 1
+                : 0;
 
     return Scaffold(
-      body: Container(
+      body: SizedBox(
         width: screenWidth,
         height: screenHeight,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/untukhome/bg.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Center(
-          child: Container(
-            padding: EdgeInsets.all(screenWidth * 0.08),
-            margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black38,
-                  offset: const Offset(0, 8),
-                  blurRadius: 16,
-                ),
-              ],
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.asset('assets/untukhome/bg.png', fit: BoxFit.cover),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  message,
-                  style: TextStyle(
-                    fontFamily: 'SpicySale',
-                    fontSize: screenHeight * 0.05,
-                    color: messageColor,
-                  ),
-                ),
-                SizedBox(height: screenHeight * 0.03),
-                Text(
-                  'Skor Akhir',
-                  style: TextStyle(
-                    fontFamily: 'SpicySale',
-                    fontSize: screenHeight * 0.03,
-                    color: Colors.brown.shade800,
-                  ),
-                ),
-                SizedBox(height: screenHeight * 0.01),
-                Text(
-                  '$_score/${_soalList.length}',
-                  style: TextStyle(
-                    fontFamily: 'SpicySale',
-                    fontSize: screenHeight * 0.06,
-                    color: Colors.orange,
-                  ),
-                ),
-                SizedBox(height: screenHeight * 0.01),
-                Text(
-                  '$percentage%',
-                  style: TextStyle(
-                    fontFamily: 'SpicySale',
-                    fontSize: screenHeight * 0.04,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-                SizedBox(height: screenHeight * 0.04),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _build3DButton(
-                      onTap: () {
-                        _audio.playButtonSound();
-                        Navigator.pop(context);
-                      },
-                      color: Colors.red,
-                      child: Icon(
-                        Icons.home,
-                        color: Colors.white,
-                        size: screenHeight * 0.04,
-                      ),
-                      width: screenWidth * 0.2,
-                      height: screenHeight * 0.08,
-                    ),
-                    _build3DButton(
-                      onTap: () {
-                        _audio.playButtonSound();
-                        _restart();
-                      },
-                      color: Colors.green,
-                      child: Icon(
-                        Icons.refresh,
-                        color: Colors.white,
-                        size: screenHeight * 0.04,
-                      ),
-                      width: screenWidth * 0.2,
-                      height: screenHeight * 0.08,
-                    ),
-                  ],
-                ),
-              ],
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Image.asset(
+                'assets/untukhome/ground.png',
+                fit: BoxFit.cover,
+                height: screenHeight * 0.18,
+              ),
             ),
-          ),
+            Center(
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.easeOutBack,
+                builder: (context, value, child) {
+                  return Transform.scale(scale: value, child: child);
+                },
+                child: SizedBox(
+                  width: screenWidth * 0.6,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/untukbelajar/alfabet/papan.png',
+                        width: screenWidth * 0.6,
+                        fit: BoxFit.contain,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.06,
+                          vertical: screenHeight * 0.04,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'SELESAI! 🎉',
+                              style: TextStyle(
+                                fontFamily: 'Bangers',
+                                fontSize: screenHeight * 0.06,
+                                color: Colors.brown.shade800,
+                              ),
+                            ),
+                            SizedBox(height: screenHeight * 0.01),
+                            // Stars
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(3, (i) {
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth * 0.01),
+                                  child: TweenAnimationBuilder<double>(
+                                    tween: Tween(begin: 0.0, end: 1.0),
+                                    duration: Duration(
+                                        milliseconds: 500 + (i * 200)),
+                                    curve: Curves.elasticOut,
+                                    builder: (context, value, child) {
+                                      return Transform.scale(
+                                          scale: value, child: child);
+                                    },
+                                    child: Icon(
+                                      i < stars
+                                          ? Icons.star_rounded
+                                          : Icons.star_border_rounded,
+                                      color: i < stars
+                                          ? Colors.amber
+                                          : Colors.brown.shade300,
+                                      size: screenHeight * 0.06,
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ),
+                            SizedBox(height: screenHeight * 0.01),
+                            Text(
+                              'Skor: $_score/${_soalList.length}',
+                              style: TextStyle(
+                                fontFamily: 'SpicySale',
+                                fontSize: screenHeight * 0.04,
+                                color: Colors.green.shade700,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '$percentage%',
+                              style: TextStyle(
+                                fontFamily: 'Bangers',
+                                fontSize: screenHeight * 0.035,
+                                color: Colors.brown.shade600,
+                              ),
+                            ),
+                            SizedBox(height: screenHeight * 0.02),
+                            // Buttons
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _build3DButton(
+                                  onTap: () {
+                                    _audio.playButtonSound();
+                                    _restart();
+                                  },
+                                  color: Colors.orange,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.replay_rounded,
+                                          color: Colors.white,
+                                          size: screenHeight * 0.025),
+                                      SizedBox(width: screenWidth * 0.01),
+                                      Text(
+                                        'Ulangi',
+                                        style: TextStyle(
+                                          fontFamily: 'SpicySale',
+                                          fontSize: screenHeight * 0.022,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  width: screenWidth * 0.17,
+                                  height: screenHeight * 0.06,
+                                ),
+                                SizedBox(width: screenWidth * 0.03),
+                                _build3DButton(
+                                  onTap: () {
+                                    _audio.playButtonSound();
+                                    Navigator.pop(context);
+                                  },
+                                  color: Colors.red,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.home_rounded,
+                                          color: Colors.white,
+                                          size: screenHeight * 0.025),
+                                      SizedBox(width: screenWidth * 0.01),
+                                      Text(
+                                        'Menu',
+                                        style: TextStyle(
+                                          fontFamily: 'SpicySale',
+                                          fontSize: screenHeight * 0.022,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  width: screenWidth * 0.17,
+                                  height: screenHeight * 0.06,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

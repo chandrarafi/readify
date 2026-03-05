@@ -3,8 +3,10 @@ import '../services/audio_service.dart';
 import 'alfabet_screen.dart';
 import 'kosakata_screen.dart';
 import 'tebak_kata_screen.dart';
+import 'menyusun_huruf_screen.dart';
 import 'history_screen.dart';
 import 'petunjuk_screen.dart';
+import 'informasi_screen.dart';
 
 class MenuScreen extends StatefulWidget {
   final String userName;
@@ -34,6 +36,7 @@ class _MenuScreenState extends State<MenuScreen>
   
   final _audio = AudioService();
 
+
   bool _isPetunjukPressed = false;
   bool _isBelajarPressed = false;
   bool _isLatihanPressed = false;
@@ -42,6 +45,8 @@ class _MenuScreenState extends State<MenuScreen>
   bool _isExitPressed = false;
   bool _isAlfabetPressed = false;
   bool _isKosaKataPressed = false;
+  bool _isTebakKataPressed = false;
+  bool _isMenyusunHurufPressed = false;
 
   @override
   void initState() {
@@ -170,7 +175,15 @@ class _MenuScreenState extends State<MenuScreen>
                       _buildMenuButton(
                         isPressed: _isPetunjukPressed,
                         onPressChanged: (v) => setState(() => _isPetunjukPressed = v),
-                        onTap: () => _showComingSoon('Petunjuk Penggunaan'),
+                        onTap: () {
+                          _audio.playButtonSound();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const PetunjukScreen(),
+                            ),
+                          );
+                        },
                         text: 'petunjuk\npenggunaan',
                         screenHeight: screenHeight,
                         screenWidth: screenWidth,
@@ -190,12 +203,7 @@ class _MenuScreenState extends State<MenuScreen>
                         onPressChanged: (v) => setState(() => _isLatihanPressed = v),
                         onTap: () {
                           _audio.playButtonSound();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const TebakKataScreen(),
-                            ),
-                          );
+                          _showLatihanSubmenu(context, screenWidth, screenHeight);
                         },
                         text: 'Latihan',
                         screenHeight: screenHeight,
@@ -214,7 +222,7 @@ class _MenuScreenState extends State<MenuScreen>
                             ),
                           );
                         },
-                        text: 'Histori',
+                        text: 'Histori Nilai',
                         screenHeight: screenHeight,
                         screenWidth: screenWidth,
                       ),
@@ -222,12 +230,44 @@ class _MenuScreenState extends State<MenuScreen>
                       _buildMenuButton(
                         isPressed: _isInformasiPressed,
                         onPressChanged: (v) => setState(() => _isInformasiPressed = v),
-                        onTap: () => _showComingSoon('Informasi'),
+                        onTap: () {
+                          _audio.playButtonSound();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const InformasiScreen(),
+                            ),
+                          );
+                        },
                         text: 'Informasi',
                         screenHeight: screenHeight,
                         screenWidth: screenWidth,
                       ),
                     ],
+                  ),
+                ),
+              ),
+            ),
+            // Karakter Perempuan
+            Positioned(
+              bottom: screenHeight * 0.08,
+              right: screenWidth * 0.38,
+              child: SlideTransition(
+                position: _slideCharacterAnimation,
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: AnimatedBuilder(
+                    animation: _bounceAnimation,
+                    builder: (context, child) {
+                      return Transform.translate(
+                        offset: Offset(0, _bounceAnimation.value * 2),
+                        child: child,
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/untukhome/karakter_perempuan.png',
+                      height: screenHeight * 0.52,
+                    ),
                   ),
                 ),
               ),
@@ -300,11 +340,13 @@ class _MenuScreenState extends State<MenuScreen>
                 ),
               ),
             ),
+
           ],
         ),
       ),
     );
   }
+
 
   Widget _buildAnimatedButton({
     required bool isPressed,
@@ -478,6 +520,122 @@ class _MenuScreenState extends State<MenuScreen>
                           onPressChanged: (v) => setState(() => _isKosaKataPressed = v),
                           onTap: () { Navigator.pop(context); _navigateToKosaKata(); },
                           text: 'Kosa Kata',
+                          screenHeight: screenHeight,
+                          screenWidth: screenWidth,
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.02),
+                      // Close button
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.elasticOut,
+                        builder: (context, value, child) => Transform.scale(scale: value, child: child),
+                        child: GestureDetector(
+                          onTap: () { _audio.playButtonSound(); Navigator.pop(context); },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.015),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 5, offset: const Offset(0, 3))],
+                            ),
+                            child: Text('Kembali', style: TextStyle(fontFamily: 'Bangers', fontSize: screenHeight * 0.03, color: Colors.white)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showLatihanSubmenu(BuildContext context, double screenWidth, double screenHeight) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Latihan Submenu',
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, animation, secondaryAnimation) => Container(),
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+            child: Center(
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  width: screenWidth * 0.5,
+                  padding: EdgeInsets.all(screenHeight * 0.03),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF8A65),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: Colors.white, width: 4),
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'LATIHAN',
+                        style: TextStyle(
+                          fontFamily: 'Bangers',
+                          fontSize: screenHeight * 0.08,
+                          color: Colors.white,
+                          shadows: const [Shadow(color: Colors.black38, offset: Offset(2, 2), blurRadius: 4)],
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.03),
+                      // Tebak Kata button
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOutBack,
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: value,
+                            child: Transform.translate(offset: Offset(-50 * (1 - value), 0), child: child),
+                          );
+                        },
+                        child: _buildSubmenuButton(
+                          isPressed: _isTebakKataPressed,
+                          onPressChanged: (v) => setState(() => _isTebakKataPressed = v),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const TebakKataScreen()));
+                          },
+                          text: 'Tebak Kata',
+                          screenHeight: screenHeight,
+                          screenWidth: screenWidth,
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.025),
+                      // Menyusun Huruf button
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        duration: const Duration(milliseconds: 400),
+                        curve: Curves.easeOutBack,
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: value,
+                            child: Transform.translate(offset: Offset(50 * (1 - value), 0), child: child),
+                          );
+                        },
+                        child: _buildSubmenuButton(
+                          isPressed: _isMenyusunHurufPressed,
+                          onPressChanged: (v) => setState(() => _isMenyusunHurufPressed = v),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const MenyusunHurufScreen()));
+                          },
+                          text: 'Menyusun\nHuruf',
                           screenHeight: screenHeight,
                           screenWidth: screenWidth,
                         ),

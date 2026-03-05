@@ -6,10 +6,13 @@ import 'screens/input_name_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize audio first
-  await AudioService().init();
-  AudioService().playBgm();
-  
+  // Initialize audio in background to prevent blocking
+  AudioService().init().then((_) {
+    AudioService().playBgm();
+  }).catchError((e) {
+    debugPrint('Error accessing AudioService: $e');
+  });
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
@@ -110,19 +113,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             ),
             Stack(
               children: [
-                Positioned(
-                  top: screenHeight * 0.03,
-                  left: screenWidth * 0.02,
-                  child: _buildAnimatedButton(
-                    isPressed: _isMenuPressed,
-                    onPressChanged: (v) => setState(() => _isMenuPressed = v),
-                    onTap: () => _showComingSoon(context, 'Menu'),
-                    child: Image.asset(
-                      'assets/Sprite/tombol orang tua.png',
-                      height: screenHeight * 0.12,
-                    ),
-                  ),
-                ),
+                // Positioned(
+                //   top: screenHeight * 0.03,
+                //   left: screenWidth * 0.02,
+                //   child: _buildAnimatedButton(
+                //     isPressed: _isMenuPressed,
+                //     onPressChanged: (v) => setState(() => _isMenuPressed = v),
+                //     onTap: () => _showComingSoon(context, 'Menu'),
+                //     child: Image.asset(
+                //       'assets/Sprite/tombol orang tua.png',
+                //       height: screenHeight * 0.12,
+                //     ),
+                //   ),
+                // ),
                 Positioned(
                   top: screenHeight * 0.03,
                   right: screenWidth * 0.02,
@@ -143,13 +146,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildFloatingLetter(0, 'assets/untukhome/huruf kecil_r.png', screenHeight * 0.14),
-                      _buildFloatingLetter(1, 'assets/untukhome/huruf kecil_e.png', screenHeight * 0.14),
-                      _buildFloatingLetter(2, 'assets/untukhome/huruf kecil_a.png', screenHeight * 0.14),
-                      _buildFloatingLetter(3, 'assets/untukhome/huruf kecil_d.png', screenHeight * 0.14),
-                      _buildFloatingLetter(4, 'assets/untukhome/huruf kecil_i.png', screenHeight * 0.14),
-                      _buildFloatingLetter(5, 'assets/untukhome/huruf kecil_f.png', screenHeight * 0.14),
-                      _buildFloatingLetter(6, 'assets/untukhome/huruf kecil_y.png', screenHeight * 0.14),
+                      _buildFloatingLetter(0, 'assets/untukhome/huruf besar_r.png', screenHeight * 0.14),
+                      _buildFloatingLetter(1, 'assets/untukhome/huruf besar_e.png', screenHeight * 0.14),
+                      _buildFloatingLetter(2, 'assets/untukhome/huruf besar_a.png', screenHeight * 0.14),
+                      _buildFloatingLetter(3, 'assets/untukhome/huruf besar_d.png', screenHeight * 0.14),
+                      _buildFloatingLetter(4, 'assets/untukhome/huruf besar_i.png', screenHeight * 0.14),
+                      _buildFloatingLetter(5, 'assets/untukhome/huruf besar_f.png', screenHeight * 0.14),
+                      _buildFloatingLetter(6, 'assets/untukhome/huruf besar_y.png', screenHeight * 0.14),
                     ],
                   ),
                 ),
@@ -166,6 +169,23 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         'assets/untukhome/button_play.png',
                         height: screenHeight * 0.18,
                       ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: screenHeight * 0.08, // Turunin sedikit
+                  left: screenWidth * 0.02,
+                  child: AnimatedBuilder(
+                    animation: _bounceAnimation,
+                    builder: (context, child) {
+                      return Transform.translate(
+                        offset: Offset(0, _bounceAnimation.value * 2),
+                        child: child,
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/untukhome/karakter_perempuan.png',
+                      height: screenHeight * 0.52, // Kecilin sedikit
                     ),
                   ),
                 ),
@@ -205,34 +225,34 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     ),
                   ),
                 ),
-                Positioned(
-                  bottom: screenHeight * 0.05,
-                  right: screenWidth * 0.03,
-                  child: _buildAnimatedButton(
-                    isPressed: _isVideoPressed,
-                    onPressChanged: (v) => setState(() => _isVideoPressed = v),
-                    onTap: () => _showComingSoon(context, 'Video'),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.tv,
-                        size: screenHeight * 0.08,
-                        color: const Color(0xFF4CAF50),
-                      ),
-                    ),
-                  ),
-                ),
+                // Positioned(
+                //   bottom: screenHeight * 0.05,
+                //   right: screenWidth * 0.03,
+                //   child: _buildAnimatedButton(
+                //     isPressed: _isVideoPressed,
+                //     onPressChanged: (v) => setState(() => _isVideoPressed = v),
+                //     onTap: () => _showComingSoon(context, 'Video'),
+                //     child: Container(
+                //       padding: const EdgeInsets.all(8),
+                //       decoration: BoxDecoration(
+                //         color: Colors.white,
+                //         borderRadius: BorderRadius.circular(12),
+                //         boxShadow: [
+                //           BoxShadow(
+                //             color: Colors.black.withValues(alpha: 0.2),
+                //             blurRadius: 8,
+                //             offset: const Offset(0, 4),
+                //           ),
+                //         ],
+                //       ),
+                //       child: Icon(
+                //         Icons.tv,
+                //         size: screenHeight * 0.08,
+                //         color: const Color(0xFF4CAF50),
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ],
