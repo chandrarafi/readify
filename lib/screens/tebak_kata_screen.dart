@@ -362,7 +362,7 @@ class _TebakKataScreenState extends State<TebakKataScreen>
                     child: Text(
                       'Tebak Kata',
                       style: TextStyle(
-                        fontFamily: 'SpicySale',
+                        
                         fontSize: screenHeight * 0.04,
                         color: Colors.white,
                       ),
@@ -397,7 +397,7 @@ class _TebakKataScreenState extends State<TebakKataScreen>
                   child: Text(
                     'Skor: $_score/${_soalList.length}',
                     style: TextStyle(
-                      fontFamily: 'SpicySale',
+                      
                       fontSize: screenHeight * 0.025,
                       color: Colors.white,
                     ),
@@ -431,7 +431,7 @@ class _TebakKataScreenState extends State<TebakKataScreen>
                             Text(
                               'Soal ${_currentIndex + 1}/${_soalList.length}',
                               style: TextStyle(
-                                fontFamily: 'SpicySale',
+                                
                                 fontSize: screenHeight * 0.025,
                                 color: Colors.brown.shade800,
                               ),
@@ -553,16 +553,15 @@ class _TebakKataScreenState extends State<TebakKataScreen>
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              _isCorrect ? Icons.check_circle : Icons.cancel,
-                              size: screenHeight * 0.1,
-                              color: Colors.white,
+                            Image.asset(
+                              _isCorrect ? 'assets/feedbenar.png' : 'assets/feedsalah.png',
+                              height: screenHeight * 0.25, // Diperbesar
                             ),
                             SizedBox(height: screenHeight * 0.02),
                             Text(
                               _isCorrect ? 'Benar!' : 'Salah!',
                               style: TextStyle(
-                                fontFamily: 'SpicySale',
+                                
                                 fontSize: screenHeight * 0.05,
                                 color: Colors.white,
                               ),
@@ -572,7 +571,7 @@ class _TebakKataScreenState extends State<TebakKataScreen>
                               Text(
                                 'Jawaban: ${_currentSoal['jawaban']}',
                                 style: TextStyle(
-                                  fontFamily: 'SpicySale',
+                                  
                                   fontSize: screenHeight * 0.03,
                                   color: Colors.white,
                                 ),
@@ -651,7 +650,7 @@ class _TebakKataScreenState extends State<TebakKataScreen>
           pilihan.toUpperCase(),
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontFamily: 'SpicySale',
+            
             fontSize: screenHeight * 0.025, // Kurangi dari 0.03 ke 0.025
             color: Colors.white,
             shadows: const [
@@ -764,7 +763,7 @@ class _TebakKataScreenState extends State<TebakKataScreen>
                             Text(
                               'Skor: $_score/${_soalList.length}',
                               style: TextStyle(
-                                fontFamily: 'SpicySale',
+                                
                                 fontSize: screenHeight * 0.04,
                                 color: Colors.green.shade700,
                                 fontWeight: FontWeight.bold,
@@ -799,7 +798,7 @@ class _TebakKataScreenState extends State<TebakKataScreen>
                                       Text(
                                         'Ulangi',
                                         style: TextStyle(
-                                          fontFamily: 'SpicySale',
+                                          
                                           fontSize: screenHeight * 0.022,
                                           color: Colors.white,
                                         ),
@@ -826,7 +825,7 @@ class _TebakKataScreenState extends State<TebakKataScreen>
                                       Text(
                                         'Menu',
                                         style: TextStyle(
-                                          fontFamily: 'SpicySale',
+                                          
                                           fontSize: screenHeight * 0.022,
                                           color: Colors.white,
                                         ),

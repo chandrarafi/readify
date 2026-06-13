@@ -320,77 +320,83 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
         child: Container(
-          padding: const EdgeInsets.all(20),
+          width: 320, // Tambahkan constraints width agar tidak terlalu melebar
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10,
+                offset: Offset(0, 5),
+              ),
+            ],
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset('assets/Sprite/bg exit.png', height: 120),
-              const SizedBox(height: 16),
               const Text(
-                'Yakin mau keluar?',
+                'YAKIN MAU KELUAR?',
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Bangers',
-                  fontSize: 24,
-                  color: Color(0xFF5D4037),
+                  fontSize: 26,
+                  letterSpacing: 1.2,
+                  color: Color(0xFFE53935),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _DialogButton(
-                    asset: 'assets/Sprite/tombol merah.png',
-                    onTap: () {
-                      _audio.playButtonSound();
-                      Navigator.pop(context);
-                    },
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _audio.playButtonSound();
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey.shade300,
+                        foregroundColor: Colors.black87,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text('TIDAK', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
                   ),
-                  _DialogButton(
-                    asset: 'assets/Sprite/tombol 1.png',
-                    onTap: () {
-                      _audio.playButtonSound();
-                      Navigator.pop(context);
-                      SystemNavigator.pop();
-                    },
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _audio.playButtonSound();
+                        Navigator.pop(context);
+                        SystemNavigator.pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE53935),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        elevation: 2,
+                      ),
+                      child: const Text('YA', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
                   ),
                 ],
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _DialogButton extends StatefulWidget {
-  final String asset;
-  final VoidCallback onTap;
-
-  const _DialogButton({required this.asset, required this.onTap});
-
-  @override
-  State<_DialogButton> createState() => _DialogButtonState();
-}
-
-class _DialogButtonState extends State<_DialogButton> {
-  bool _isPressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) {
-        setState(() => _isPressed = false);
-        widget.onTap();
-      },
-      onTapCancel: () => setState(() => _isPressed = false),
-      child: AnimatedScale(
-        scale: _isPressed ? 0.85 : 1.0,
-        duration: const Duration(milliseconds: 150),
-        child: Image.asset(widget.asset, height: 50),
       ),
     );
   }

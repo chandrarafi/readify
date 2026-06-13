@@ -38,7 +38,7 @@ dependencies:
   shared_preferences: ^2.2.2
   intl: ^0.19.0
   audio_session: ^0.1.25
-  audioplayers: ^6.5.1
+  audioplayers: ^6.6.0
 
 dev_dependencies:
   flutter_test:
@@ -71,6 +71,8 @@ flutter:
     - assets/untukbelajar/kosakata/
     - assets/untuklatihan/
     - assets/musik.mp3
+    - assets/feedbenar.png
+    - assets/feedsalah.png
 
   fonts:
     - family: Bangers

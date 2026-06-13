@@ -327,7 +327,7 @@ class _MenuScreenState extends State<MenuScreen>
                                 textAlign: TextAlign.center,
                               ),
                               Text(
-                                'dari ${widget.userClass}',
+                                'dari kelas ${widget.userClass}',
                                 style: TextStyle(fontFamily: 'Bangers', fontSize: screenHeight * 0.03, color: Colors.black87),
                                 textAlign: TextAlign.center,
                               ),

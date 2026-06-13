@@ -473,7 +473,6 @@ class _KosaKataScreenState extends State<KosaKataScreen>
                     child: Text(
                       '${_currentWordIndex + 1} / ${_currentList.length}',
                       style: TextStyle(
-                        fontFamily: 'SpicySale',
                         fontSize: screenHeight * 0.035,
                         color: Colors.white,
                         shadows: const [
@@ -530,7 +529,6 @@ class _KosaKataScreenState extends State<KosaKataScreen>
         return Text(
           entry.value,
           style: TextStyle(
-            fontFamily: 'SpicySale',
             fontSize: fontSize,
             color: color,
             shadows: [
@@ -567,7 +565,6 @@ class _KosaKataScreenState extends State<KosaKataScreen>
         child: Text(
           suku.toUpperCase(),
           style: TextStyle(
-            fontFamily: 'SpicySale',
             fontSize: screenHeight * 0.05,
             color: Colors.white,
             shadows: const [
@@ -650,7 +647,6 @@ class _KosaKataScreenState extends State<KosaKataScreen>
         child: Text(
           title,
           style: TextStyle(
-            fontFamily: 'SpicySale',
             fontSize: screenHeight * 0.028,
             color: Colors.white,
             shadows: const [

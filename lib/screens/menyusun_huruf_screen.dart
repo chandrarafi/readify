@@ -40,6 +40,7 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
   int _score = 0;
   bool _gameFinished = false;
   bool _showResult = false;
+  bool _showPopup = false;
   bool _isCorrect = false;
 
   // Huruf yang tersedia (diacak) dan huruf yang sudah dipilih
@@ -158,6 +159,7 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
 
     setState(() {
       _showResult = true;
+      _showPopup = true;
       _isCorrect = correct;
       if (correct) _score++;
     });
@@ -171,10 +173,23 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
       _audio.playWrongSound();
     }
 
-    // Auto-advance after delay
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    // Tampilkan feed selama 2 detik lalu tutup
+    Future.delayed(const Duration(milliseconds: 2000), () async {
       if (!mounted) return;
-      _nextQuestion();
+
+      // Animasi menutup dialog
+      await _resultController.reverse();
+      
+      if (!mounted) return;
+      setState(() {
+        _showPopup = false;
+      });
+
+      // Beri jeda 1.5 detik untuk melihat susunan jawaban di papan setelah dialog tertutup
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (!mounted) return;
+        _nextQuestion();
+      });
     });
   }
 
@@ -188,6 +203,7 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
     setState(() {
       _currentIndex++;
       _showResult = false;
+      _showPopup = false;
       _isCorrect = false;
       _initLetters();
     });
@@ -218,6 +234,7 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
       _score = 0;
       _gameFinished = false;
       _showResult = false;
+      _showPopup = false;
       _isCorrect = false;
       _soalList.shuffle(Random());
       _initLetters();
@@ -337,7 +354,7 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
                     child: Text(
                       'Menyusun Huruf',
                       style: TextStyle(
-                        fontFamily: 'SpicySale',
+                        
                         fontSize: sh * 0.04,
                         color: Colors.white,
                       ),
@@ -372,7 +389,7 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
                   child: Text(
                     'Skor: $_score/${_soalList.length}',
                     style: TextStyle(
-                      fontFamily: 'SpicySale',
+                      
                       fontSize: sh * 0.025,
                       color: Colors.white,
                     ),
@@ -396,6 +413,10 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
                 ),
               ),
             ),
+
+            // Result overlay (seperti di tebak kata)
+            if (_showPopup)
+              _buildResultFeedback(sw, sh),
           ],
         ),
       ),
@@ -427,7 +448,7 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
                 Text(
                   'Soal ${_currentIndex + 1}/${_soalList.length}',
                   style: TextStyle(
-                    fontFamily: 'SpicySale',
+                    
                     fontSize: sh * 0.02,
                     color: Colors.brown.shade800,
                   ),
@@ -443,12 +464,12 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
                       borderRadius: BorderRadius.circular(12),
                       child: Image.asset(
                         'assets/untuklatihan/$_currentWord.png',
-                        height: sh * 0.1,
-                        width: sh * 0.1,
+                        height: sh * 0.28, // Gambar soal diperbesar sesuai request
+                        width: sh * 0.28, // Sisi width ikut dibesarkan
                         fit: BoxFit.cover,
                         errorBuilder: (c, e, s) => Icon(
                           Icons.image_outlined,
-                          size: sh * 0.08,
+                          size: sh * 0.12,
                           color: Colors.brown.shade300,
                         ),
                       ),
@@ -489,12 +510,6 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
 
                 // Available letters (scrambled)
                 _buildAvailableLetters(sw, sh),
-
-                // Result feedback
-                if (_showResult) ...[
-                  SizedBox(height: sh * 0.015),
-                  _buildResultFeedback(sw, sh),
-                ],
               ],
             ),
           ),
@@ -554,7 +569,7 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
                       errorBuilder: (c, e, s) => Text(
                         letter.toUpperCase(),
                         style: TextStyle(
-                          fontFamily: 'SpicySale',
+                          
                           fontSize: sh * 0.035,
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -564,7 +579,7 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
                   : Text(
                       '?',
                       style: TextStyle(
-                        fontFamily: 'SpicySale',
+                        
                         fontSize: sh * 0.03,
                         color: Colors.brown.shade300,
                       ),
@@ -627,7 +642,7 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
                     errorBuilder: (c, e, s) => Text(
                       letter.toUpperCase(),
                       style: TextStyle(
-                        fontFamily: 'SpicySale',
+                        
                         fontSize: sh * 0.035,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -644,48 +659,57 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
   }
 
   Widget _buildResultFeedback(double sw, double sh) {
-    return ScaleTransition(
-      scale: CurvedAnimation(
-        parent: _resultController,
-        curve: Curves.elasticOut,
-      ),
+    return Positioned.fill(
       child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: sw * 0.04,
-          vertical: sh * 0.008,
-        ),
-        decoration: BoxDecoration(
-          color: _isCorrect ? Colors.green : Colors.red,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              offset: const Offset(0, 3),
-              blurRadius: 0,
+        color: Colors.black54,
+        child: Center(
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: _resultController,
+              curve: Curves.elasticOut,
             ),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              _isCorrect ? Icons.check_circle : Icons.cancel,
-              color: Colors.white,
-              size: sh * 0.03,
-            ),
-            SizedBox(width: sw * 0.01),
-            Text(
-              _isCorrect
-                  ? 'Benar! 🎉'
-                  : 'Salah! Jawaban: ${_currentWord.toUpperCase()}',
-              style: TextStyle(
-                fontFamily: 'SpicySale',
-                fontSize: sh * 0.022,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+            child: Container(
+              padding: EdgeInsets.all(sw * 0.08),
+              decoration: BoxDecoration(
+                color: _isCorrect ? Colors.green : Colors.red,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black38,
+                    offset: const Offset(0, 8),
+                    blurRadius: 16,
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    _isCorrect ? 'assets/feedbenar.png' : 'assets/feedsalah.png',
+                    height: sh * 0.25, // Ukuran disamakan dengan tebak kata
+                  ),
+                  SizedBox(height: sh * 0.02),
+                  Text(
+                    _isCorrect ? 'Benar!' : 'Salah!',
+                    style: TextStyle(
+                      fontSize: sh * 0.05,
+                      color: Colors.white,
+                    ),
+                  ),
+                  if (!_isCorrect) ...[
+                    SizedBox(height: sh * 0.01),
+                    Text(
+                      'Jawaban: ${_currentWord.toUpperCase()}',
+                      style: TextStyle(
+                        fontSize: sh * 0.03,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -788,7 +812,7 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
                             Text(
                               'Skor: $_score/${_soalList.length}',
                               style: TextStyle(
-                                fontFamily: 'SpicySale',
+                                
                                 fontSize: sh * 0.04,
                                 color: Colors.green.shade700,
                                 fontWeight: FontWeight.bold,
@@ -820,7 +844,7 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
                                       Text(
                                         'Ulangi',
                                         style: TextStyle(
-                                          fontFamily: 'SpicySale',
+                                          
                                           fontSize: sh * 0.022,
                                           color: Colors.white,
                                         ),
@@ -844,7 +868,7 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
                                       Text(
                                         'Menu',
                                         style: TextStyle(
-                                          fontFamily: 'SpicySale',
+                                          
                                           fontSize: sh * 0.022,
                                           color: Colors.white,
                                         ),
