@@ -207,6 +207,23 @@ class AudioService {
     }
   }
 
+  // Play audio dari path custom (untuk mengucapkan kata)
+  Future<void> playAudio(String assetPath) async {
+    if (!_initialized) return;
+    try {
+      await stopSpeech();
+      // Remove 'assets/' prefix jika ada karena AssetSource otomatis menambahkan
+      String path = assetPath.startsWith('assets/') 
+          ? assetPath.substring('assets/'.length) 
+          : assetPath;
+      await _speechPlayer.play(AssetSource(path));
+      debugPrint('Playing audio: $path');
+    } catch (e) {
+      debugPrint('Error play audio "$assetPath": $e');
+      rethrow; // Throw error agar bisa di-catch oleh caller untuk fallback ke TTS
+    }
+  }
+
   void dispose() {
     _bgmPlayer.dispose();
     _speechPlayer.dispose();

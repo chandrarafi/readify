@@ -4,6 +4,7 @@ import 'alfabet_screen.dart';
 import 'kosakata_screen.dart';
 import 'tebak_kata_screen.dart';
 import 'menyusun_huruf_screen.dart';
+import 'mengucapkan_kata_screen.dart';
 import 'history_screen.dart';
 import 'petunjuk_screen.dart';
 import 'informasi_screen.dart';
@@ -47,6 +48,9 @@ class _MenuScreenState extends State<MenuScreen>
   bool _isKosaKataPressed = false;
   bool _isTebakKataPressed = false;
   bool _isMenyusunHurufPressed = false;
+  bool _isMengucapkanKataPressed = false;
+  bool _isKvKvPressed = false;
+  bool _isKvKvkPressed = false;
 
   @override
   void initState() {
@@ -616,7 +620,7 @@ class _MenuScreenState extends State<MenuScreen>
                           screenWidth: screenWidth,
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.025),
+                       SizedBox(height: screenHeight * 0.025),
                       // Menyusun Huruf button
                       TweenAnimationBuilder<double>(
                         tween: Tween(begin: 0.0, end: 1.0),
@@ -640,6 +644,146 @@ class _MenuScreenState extends State<MenuScreen>
                           screenWidth: screenWidth,
                         ),
                       ),
+                      SizedBox(height: screenHeight * 0.025),
+                      // Mengucapkan Kata button
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeOutBack,
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: value,
+                            child: Transform.translate(offset: Offset(-50 * (1 - value), 0), child: child),
+                          );
+                        },
+                        child: _buildSubmenuButton(
+                          isPressed: _isMengucapkanKataPressed,
+                          onPressChanged: (v) => setState(() => _isMengucapkanKataPressed = v),
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showMengucapkanSubmenu(context, screenWidth, screenHeight);
+                          },
+                          text: 'Mengucapkan\nKata',
+                          screenHeight: screenHeight,
+                          screenWidth: screenWidth,
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.02),
+                      // Close button
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        duration: const Duration(milliseconds: 600),
+                        curve: Curves.elasticOut,
+                        builder: (context, value, child) => Transform.scale(scale: value, child: child),
+                        child: GestureDetector(
+                          onTap: () { _audio.playButtonSound(); Navigator.pop(context); },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.015),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 5, offset: const Offset(0, 3))],
+                            ),
+                            child: Text('Kembali', style: TextStyle(fontFamily: 'Bangers', fontSize: screenHeight * 0.03, color: Colors.white)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showMengucapkanSubmenu(BuildContext context, double screenWidth, double screenHeight) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Mengucapkan Submenu',
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, animation, secondaryAnimation) => Container(),
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+            child: Center(
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  width: screenWidth * 0.5,
+                  padding: EdgeInsets.all(screenHeight * 0.03),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF8A65),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: Colors.white, width: 4),
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'PILIH KATEGORI',
+                        style: TextStyle(
+                          fontFamily: 'Bangers',
+                          fontSize: screenHeight * 0.06,
+                          color: Colors.white,
+                          shadows: const [Shadow(color: Colors.black38, offset: Offset(2, 2), blurRadius: 4)],
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.03),
+                      // KV-KV Button
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOutBack,
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: value,
+                            child: Transform.translate(offset: Offset(-50 * (1 - value), 0), child: child),
+                          );
+                        },
+                        child: _buildSubmenuButton(
+                          isPressed: _isKvKvPressed,
+                          onPressChanged: (v) => setState(() => _isKvKvPressed = v),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const MengucapkanKataScreen(category: 'KV-KV')));
+                          },
+                          text: 'KV-KV',
+                          screenHeight: screenHeight,
+                          screenWidth: screenWidth,
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.025),
+                      // KV-KVK Button
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        duration: const Duration(milliseconds: 400),
+                        curve: Curves.easeOutBack,
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: value,
+                            child: Transform.translate(offset: Offset(50 * (1 - value), 0), child: child),
+                          );
+                        },
+                        child: _buildSubmenuButton(
+                          isPressed: _isKvKvkPressed,
+                          onPressChanged: (v) => setState(() => _isKvKvkPressed = v),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const MengucapkanKataScreen(category: 'KV-KVK')));
+                          },
+                          text: 'KV-KVK',
+                          screenHeight: screenHeight,
+                          screenWidth: screenWidth,
+                        ),
+                      ),
                       SizedBox(height: screenHeight * 0.02),
                       // Close button
                       TweenAnimationBuilder<double>(
@@ -648,7 +792,11 @@ class _MenuScreenState extends State<MenuScreen>
                         curve: Curves.elasticOut,
                         builder: (context, value, child) => Transform.scale(scale: value, child: child),
                         child: GestureDetector(
-                          onTap: () { _audio.playButtonSound(); Navigator.pop(context); },
+                          onTap: () { 
+                            _audio.playButtonSound(); 
+                            Navigator.pop(context); 
+                            _showLatihanSubmenu(context, screenWidth, screenHeight);
+                          },
                           child: Container(
                             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.015),
                             decoration: BoxDecoration(
