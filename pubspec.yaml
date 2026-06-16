@@ -39,6 +39,11 @@ dependencies:
   intl: ^0.19.0
   audio_session: ^0.1.25
   audioplayers: ^6.6.0
+  speech_to_text: ^7.4.0
+  flutter_tts: ^4.1.0
+  http: ^1.1.0
+  permission_handler: ^11.0.1
+  path_provider: ^2.1.1
 
 dev_dependencies:
   flutter_test:
@@ -64,6 +69,9 @@ flutter:
     - assets/AudioClip/
     - assets/AudioClip/kosakata/
     - assets/AudioClip/sukukata/
+    - assets/AudioClip/mengucap/
+    - assets/AudioClip/mengucap/kv-kv/
+    - assets/AudioClip/mengucap/kv-kvk/
     - assets/untukhome/
     - assets/untukisinama/
     - assets/untukmenu/
