@@ -4,6 +4,7 @@ import '../services/audio_service.dart';
 import '../services/score_service.dart';
 import '../models/score_history.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/exercise_intro_banner.dart';
 
 class MenyusunHurufScreen extends StatefulWidget {
   const MenyusunHurufScreen({super.key});
@@ -16,19 +17,20 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
     with TickerProviderStateMixin {
   final _audio = AudioService();
   final _scoreService = ScoreService();
+  bool _showIntroBanner = true;
 
   // 10 soal menyusun huruf
   final List<String> _soalList = [
-    'dapur',
-    'minum',
-    'kapas',
-    'wajan',
-    'pagar',
-    'jaket',
-    'tikar',
     'kasur',
-    'rakit',
-    'sawah',
+    'dapur',
+    'jaket',
+    'wajan',
+    'kapas',
+    'baju',
+    'sofa',
+    'tisu',
+    'jari',
+    'roti',
   ];
 
   // Map huruf ke index keyboard asset (a=0, b=1, ..., z=25)
@@ -99,11 +101,16 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
     );
 
     _entryController.forward();
+    _showIntroBanner = true;
+  }
 
-    // Play audio for first word after a short delay
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) _audio.playLatihanSound(_currentWord);
-    });
+  void _onIntroBannerFinished() {
+    if (mounted) {
+      setState(() {
+        _showIntroBanner = false;
+      });
+      _audio.playLatihanSound(_currentWord);
+    }
   }
 
   @override
@@ -173,8 +180,8 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
       _audio.playWrongSound();
     }
 
-    // Tampilkan feed selama 2 detik lalu tutup
-    Future.delayed(const Duration(milliseconds: 2000), () async {
+    // Tampilkan feedback selama 6 detik agar audio benar-benar selesai (tambah 1 detik)
+    Future.delayed(const Duration(milliseconds: 6000), () async {
       if (!mounted) return;
 
       // Animasi menutup dialog
@@ -185,11 +192,7 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
         _showPopup = false;
       });
 
-      // Beri jeda 1.5 detik untuk melihat susunan jawaban di papan setelah dialog tertutup
-      Future.delayed(const Duration(milliseconds: 1500), () {
-        if (!mounted) return;
-        _nextQuestion();
-      });
+      _nextQuestion();
     });
   }
 
@@ -238,6 +241,7 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
       _isCorrect = false;
       _soalList.shuffle(Random());
       _initLetters();
+      _showIntroBanner = true;
     });
   }
 
@@ -417,6 +421,16 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
             // Result overlay (seperti di tebak kata)
             if (_showPopup)
               _buildResultFeedback(sw, sh),
+
+            if (_showIntroBanner)
+              ExerciseIntroBanner(
+                title: 'LATIHAN MENYUSUN HURUF',
+                instruction: 'Pilih dan susun huruf-huruf acak menjadi kata yang benar!',
+                emoji: '🧩',
+                primaryColor: const Color(0xFFAB47BC),
+                audioAsset: 'assets/menyusunkata.m4a',
+                onFinished: _onIntroBannerFinished,
+              ),
           ],
         ),
       ),
@@ -464,9 +478,9 @@ class _MenyusunHurufScreenState extends State<MenyusunHurufScreen>
                       borderRadius: BorderRadius.circular(12),
                       child: Image.asset(
                         'assets/untuklatihan/$_currentWord.png',
-                        height: sh * 0.28, // Gambar soal diperbesar sesuai request
-                        width: sh * 0.28, // Sisi width ikut dibesarkan
-                        fit: BoxFit.cover,
+                        height: sh * 0.28,
+                        width: sh * 0.28,
+                        fit: BoxFit.contain,
                         errorBuilder: (c, e, s) => Icon(
                           Icons.image_outlined,
                           size: sh * 0.12,

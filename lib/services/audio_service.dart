@@ -54,7 +54,7 @@ class AudioService {
       await _bgmPlayer.setReleaseMode(ReleaseMode.loop);
       await _bgmPlayer.setPlayerMode(PlayerMode.mediaPlayer);
       await _bgmPlayer.setSource(AssetSource('musik.mp3'));
-      await _bgmPlayer.setVolume(0.5);
+      await _bgmPlayer.setVolume(0.2);
     } catch (e) {
       debugPrint('Error init BGM: $e');
     }
@@ -115,6 +115,15 @@ class AudioService {
     }
   }
 
+  Future<void> setBgmVolume(double volume) async {
+    if (!_initialized) return;
+    try {
+      await _bgmPlayer.setVolume(volume);
+    } catch (e) {
+      debugPrint('Error set BGM volume: $e');
+    }
+  }
+
   Future<void> playButtonSound() async {
     if (!_initialized) return;
     try {
@@ -131,9 +140,12 @@ class AudioService {
     if (!_initialized) return;
     try {
       await _feedbackPlayer.stop();
-      await _feedbackPlayer.play(AssetSource('untuklatihan/benar.mp3'));
+      await _feedbackPlayer.play(AssetSource('jawaban_benar_new.m4a'));
     } catch (e) {
       debugPrint('Error play correct SFX: $e');
+      try {
+        await _feedbackPlayer.play(AssetSource('untuklatihan/benar.mp3'));
+      } catch (_) {}
     }
   }
 
@@ -141,9 +153,12 @@ class AudioService {
     if (!_initialized) return;
     try {
       await _feedbackPlayer.stop();
-      await _feedbackPlayer.play(AssetSource('untuklatihan/salah.mp3'));
+      await _feedbackPlayer.play(AssetSource('jawaban_salah_new.m4a'));
     } catch (e) {
       debugPrint('Error play wrong SFX: $e');
+      try {
+        await _feedbackPlayer.play(AssetSource('untuklatihan/salah.mp3'));
+      } catch (_) {}
     }
   }
 

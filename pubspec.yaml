@@ -81,6 +81,12 @@ flutter:
     - assets/musik.mp3
     - assets/feedbenar.png
     - assets/feedsalah.png
+    - assets/jawaban_benar_new.m4a
+    - assets/jawaban_salah_new.m4a
+    - assets/tebakkata.m4a
+    - assets/menyusunkata.m4a
+    - assets/mengucapkan.m4a
+
 
   fonts:
     - family: Bangers

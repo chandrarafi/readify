@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="/app/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="Readify - Aplikasi Belajar Membaca Interaktif Anak">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Readify">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>Readify - Belajar Membaca</title>
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Styles for Preloader & Landscape Enforcement Overlay -->
+  <style>
+    #flutter-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-family: system-ui, -apple-system, sans-serif;
+      transition: opacity 0.4s ease;
+    }
+    .loader-mascot {
+      font-size: 4.5rem;
+      margin-bottom: 16px;
+      animation: pulseMascot 1.8s infinite ease-in-out;
+    }
+    @keyframes pulseMascot {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+    .loader-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 8px;
+    }
+    .loader-subtitle {
+      font-size: 1rem;
+      color: #94a3b8;
+      margin-bottom: 24px;
+      max-width: 320px;
+      line-height: 1.5;
+    }
+    .progress-bar-box {
+      width: 260px;
+      height: 12px;
+      background: #334155;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .progress-bar-fill {
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      border-radius: 20px;
+      animation: fillAnim 2.5s infinite ease-in-out;
+    }
+    @keyframes fillAnim {
+      0% { width: 15%; }
+      50% { width: 85%; }
+      100% { width: 100%; }
+    }
+
+    #orientation-overlay {
+      display: none;
+    }
+    @media screen and (orientation: portrait) and (max-width: 900px) {
+      #orientation-overlay {
+        display: flex !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #0f172a;
+        color: #ffffff;
+        z-index: 9999999;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 24px;
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      .rotate-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        animation: rotateAnim 2s infinite ease-in-out;
+      }
+      @keyframes rotateAnim {
+        0% { transform: rotate(0deg); }
+        50% { transform: rotate(90deg); }
+        100% { transform: rotate(0deg); }
+      }
+      .rotate-title {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #fde047;
+        margin-bottom: 12px;
+      }
+      .rotate-desc {
+        font-size: 1.05rem;
+        color: #94a3b8;
+        max-width: 320px;
+        line-height: 1.5;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Preloader Screen -->
+  <div id="flutter-loader">
+    <div class="loader-mascot">📚✨</div>
+    <div class="loader-title">Memuat Readify...</div>
+    <div class="loader-subtitle">Menyiapkan audio & animasi interaktif si kecil...</div>
+    <div class="progress-bar-box">
+      <div class="progress-bar-fill"></div>
+    </div>
+  </div>
+
+  <!-- Landscape Lock Overlay -->
+  <div id="orientation-overlay">
+    <div class="rotate-icon">🔄📱</div>
+    <div class="rotate-title">Harap Miringkan Perangkat</div>
+    <div class="rotate-desc">
+      Aplikasi Readify dirancang khusus untuk posisi <strong>Landscape (Mendatar)</strong> agar pengalaman belajar anak maksimal.
+    </div>
+  </div>
+
+  <script>
+    // Lock screen orientation to landscape if supported by browser
+    window.addEventListener('load', function() {
+      if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape').catch(function(err) {
+          console.log('Web orientation lock info:', err.message);
+        });
+      }
+    });
+
+    // Remove preloader once Flutter web app initializes
+    window.addEventListener('flutter-first-frame', function () {
+      const loader = document.getElementById('flutter-loader');
+      if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => loader.remove(), 400);
+      }
+    });
+  </script>
+
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

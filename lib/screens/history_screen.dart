@@ -193,9 +193,17 @@ class _HistoryScreenState extends State<HistoryScreen>
                     child: Text(
                       '⭐ Nilai Kamu ⭐',
                       style: TextStyle(
-                        fontFamily: 'SpicySale',
-                        fontSize: sh * 0.035,
+                        fontFamily: 'Bangers',
+                        fontSize: sh * 0.048,
                         color: Colors.white,
+                        letterSpacing: 1.2,
+                        shadows: const [
+                          Shadow(
+                            color: Colors.black38,
+                            offset: Offset(2, 2),
+                            blurRadius: 4,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -238,20 +246,20 @@ class _HistoryScreenState extends State<HistoryScreen>
 
   Widget _buildPapanContent(double sw, double sh) {
     return SizedBox(
-      width: sw * 0.8,
+      width: sw * 0.82,
       child: Stack(
         alignment: Alignment.center,
         children: [
           // Papan background
           Image.asset(
             'assets/untukbelajar/alfabet/papan.png',
-            width: sw * 0.8,
+            width: sw * 0.82,
             fit: BoxFit.contain,
           ),
           // Content
           Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: sw * 0.07,
+              horizontal: sw * 0.135,
               vertical: sh * 0.025,
             ),
             child: _history.isEmpty
@@ -267,22 +275,24 @@ class _HistoryScreenState extends State<HistoryScreen>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('📚', style: TextStyle(fontSize: sh * 0.07)),
+        Text('📚', style: TextStyle(fontSize: sh * 0.08)),
         SizedBox(height: sh * 0.01),
         Text(
           'Belum Ada Nilai',
           style: TextStyle(
-            fontFamily: 'SpicySale',
-            fontSize: sh * 0.03,
+            fontFamily: 'Bangers',
+            fontSize: sh * 0.045,
             color: Colors.brown.shade800,
           ),
         ),
+        SizedBox(height: sh * 0.005),
         Text(
           'Ayo main latihan dulu!',
           style: TextStyle(
-            fontFamily: 'SpicySale',
-            fontSize: sh * 0.018,
-            color: Colors.brown.shade500,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.bold,
+            fontSize: sh * 0.028,
+            color: Colors.brown.shade600,
           ),
         ),
       ],
@@ -297,16 +307,16 @@ class _HistoryScreenState extends State<HistoryScreen>
         Container(
           padding: EdgeInsets.symmetric(
             horizontal: sw * 0.02,
-            vertical: sh * 0.006,
+            vertical: sh * 0.008,
           ),
           decoration: BoxDecoration(
             color: Colors.brown.shade700,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
             children: [
               SizedBox(
-                width: sw * 0.06,
+                width: sw * 0.045,
                 child: Text(
                   'No',
                   style: _headerStyle(sh),
@@ -326,9 +336,9 @@ class _HistoryScreenState extends State<HistoryScreen>
                 ),
               ),
               SizedBox(
-                width: sw * 0.1,
+                width: sw * 0.11,
                 child: Text(
-                  '⭐',
+                  '⭐ Bintang',
                   style: _headerStyle(sh),
                   textAlign: TextAlign.center,
                 ),
@@ -336,7 +346,7 @@ class _HistoryScreenState extends State<HistoryScreen>
             ],
           ),
         ),
-        SizedBox(height: sh * 0.006),
+        SizedBox(height: sh * 0.008),
         // Data rows
         ...List.generate(_history.length, (i) {
           return _buildRow(_history[i], i, sw, sh);
@@ -349,8 +359,8 @@ class _HistoryScreenState extends State<HistoryScreen>
     final percentage = item.percentage;
     final stars = percentage >= 80 ? 3 : percentage >= 60 ? 2 : percentage >= 30 ? 1 : 0;
     final rowColor = index.isEven
-        ? Colors.brown.shade100.withValues(alpha: 0.4)
-        : Colors.brown.shade200.withValues(alpha: 0.3);
+        ? Colors.brown.shade100.withValues(alpha: 0.5)
+        : Colors.brown.shade200.withValues(alpha: 0.4);
 
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
@@ -362,14 +372,15 @@ class _HistoryScreenState extends State<HistoryScreen>
       child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: sw * 0.02,
-          vertical: sh * 0.008,
+          vertical: sh * 0.01,
         ),
+        margin: EdgeInsets.only(bottom: sh * 0.004),
         decoration: BoxDecoration(
           color: rowColor,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(8),
           border: Border(
             bottom: BorderSide(
-              color: Colors.brown.shade300.withValues(alpha: 0.3),
+              color: Colors.brown.shade300.withValues(alpha: 0.4),
               width: 1,
             ),
           ),
@@ -378,13 +389,14 @@ class _HistoryScreenState extends State<HistoryScreen>
           children: [
             // Number
             SizedBox(
-              width: sw * 0.06,
+              width: sw * 0.045,
               child: Text(
                 '${index + 1}',
                 style: TextStyle(
-                  fontFamily: 'SpicySale',
-                  fontSize: sh * 0.02,
-                  color: Colors.brown.shade800,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.bold,
+                  fontSize: sh * 0.026,
+                  color: Colors.brown.shade900,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -395,9 +407,10 @@ class _HistoryScreenState extends State<HistoryScreen>
               child: Text(
                 item.category,
                 style: TextStyle(
-                  fontFamily: 'SpicySale',
-                  fontSize: sh * 0.017,
-                  color: Colors.brown.shade700,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.bold,
+                  fontSize: sh * 0.024,
+                  color: Colors.brown.shade900,
                 ),
               ),
             ),
@@ -407,28 +420,28 @@ class _HistoryScreenState extends State<HistoryScreen>
               child: Text(
                 '${item.score}/${item.totalQuestions}',
                 style: TextStyle(
-                  fontFamily: 'SpicySale',
-                  fontSize: sh * 0.02,
+                  fontFamily: 'Roboto',
+                  fontSize: sh * 0.026,
                   color: percentage >= 80
-                      ? Colors.green.shade700
+                      ? Colors.green.shade800
                       : percentage >= 60
-                          ? Colors.blue.shade700
-                          : Colors.orange.shade700,
-                  fontWeight: FontWeight.bold,
+                          ? Colors.blue.shade800
+                          : Colors.orange.shade800,
+                  fontWeight: FontWeight.w900,
                 ),
                 textAlign: TextAlign.center,
               ),
             ),
             // Stars
             SizedBox(
-              width: sw * 0.1,
+              width: sw * 0.11,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(3, (i) {
                   return Icon(
                     i < stars ? Icons.star_rounded : Icons.star_border_rounded,
-                    color: i < stars ? Colors.amber : Colors.brown.shade300,
-                    size: sh * 0.02,
+                    color: i < stars ? Colors.amber.shade700 : Colors.brown.shade300,
+                    size: sh * 0.028,
                   );
                 }),
               ),
@@ -441,9 +454,10 @@ class _HistoryScreenState extends State<HistoryScreen>
 
   TextStyle _headerStyle(double sh) {
     return TextStyle(
-      fontFamily: 'SpicySale',
-      fontSize: sh * 0.016,
+      fontFamily: 'Bangers',
+      fontSize: sh * 0.028,
       color: Colors.white,
+      letterSpacing: 1.0,
     );
   }
 }

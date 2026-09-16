@@ -12,7 +12,7 @@
 
 ### Audio
 
-- Background music (`assets/musik.mp3`) - loop, volume 50%
+- Background music (`assets/musik.mp3`) - loop, volume 20%
 - Sound effect button click (`assets/AudioClip/button.wav`)
 - Tombol sound untuk toggle on/off backsound
 - Menggunakan package `just_audio`
