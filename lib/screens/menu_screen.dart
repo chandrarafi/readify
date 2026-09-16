@@ -8,6 +8,7 @@ import 'mengucapkan_kata_screen.dart';
 import 'history_screen.dart';
 import 'petunjuk_screen.dart';
 import 'informasi_screen.dart';
+import 'tujuan_pembelajaran_screen.dart';
 
 class MenuScreen extends StatefulWidget {
   final String userName;
@@ -39,6 +40,7 @@ class _MenuScreenState extends State<MenuScreen>
 
 
   bool _isPetunjukPressed = false;
+  bool _isTujuanPressed = false;
   bool _isBelajarPressed = false;
   bool _isLatihanPressed = false;
   bool _isHistoriPressed = false;
@@ -129,7 +131,7 @@ class _MenuScreenState extends State<MenuScreen>
                 height: screenHeight * 0.18,
               ),
             ),
-            // Exit button
+            // Exit & Informasi buttons
             Positioned(
               top: screenHeight * 0.03,
               right: screenWidth * 0.02,
@@ -137,14 +139,34 @@ class _MenuScreenState extends State<MenuScreen>
                 opacity: _fadeAnimation,
                 child: ScaleTransition(
                   scale: _scaleAnimation,
-                  child: _buildAnimatedButton(
-                    isPressed: _isExitPressed,
-                    onPressChanged: (v) => setState(() => _isExitPressed = v),
-                    onTap: () => Navigator.pop(context),
-                    child: Image.asset(
-                      'assets/untukhome/tombol exit.png',
-                      height: screenHeight * 0.1,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildAnimatedButton(
+                        isPressed: _isInformasiPressed,
+                        onPressChanged: (v) => setState(() => _isInformasiPressed = v),
+                        onTap: () {
+                          _audio.playButtonSound();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const InformasiScreen(),
+                            ),
+                          );
+                        },
+                        child: _buildWAProfileIcon(screenHeight * 0.1),
+                      ),
+                      SizedBox(width: screenWidth * 0.015),
+                      _buildAnimatedButton(
+                        isPressed: _isExitPressed,
+                        onPressChanged: (v) => setState(() => _isExitPressed = v),
+                        onTap: () => Navigator.pop(context),
+                        child: Image.asset(
+                          'assets/untukhome/tombol exit.png',
+                          height: screenHeight * 0.1,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -152,7 +174,7 @@ class _MenuScreenState extends State<MenuScreen>
             // Menu Title and buttons
             Positioned(
               left: screenWidth * 0.05,
-              top: screenHeight * 0.05,
+              top: screenHeight * 0.025,
               child: SlideTransition(
                 position: _slideMenuAnimation,
                 child: FadeTransition(
@@ -166,7 +188,7 @@ class _MenuScreenState extends State<MenuScreen>
                           'MENU',
                           style: TextStyle(
                             fontFamily: 'Bangers',
-                            fontSize: screenHeight * 0.1,
+                            fontSize: screenHeight * 0.08,
                             color: Colors.white,
                             shadows: const [
                               Shadow(color: Colors.black38, offset: Offset(2, 2), blurRadius: 4),
@@ -175,7 +197,7 @@ class _MenuScreenState extends State<MenuScreen>
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.02),
+                      SizedBox(height: screenHeight * 0.012),
                       _buildMenuButton(
                         isPressed: _isPetunjukPressed,
                         onPressChanged: (v) => setState(() => _isPetunjukPressed = v),
@@ -192,7 +214,24 @@ class _MenuScreenState extends State<MenuScreen>
                         screenHeight: screenHeight,
                         screenWidth: screenWidth,
                       ),
-                      SizedBox(height: screenHeight * 0.035),
+                      SizedBox(height: screenHeight * 0.018),
+                      _buildMenuButton(
+                        isPressed: _isTujuanPressed,
+                        onPressChanged: (v) => setState(() => _isTujuanPressed = v),
+                        onTap: () {
+                          _audio.playButtonSound();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const TujuanPembelajaranScreen(),
+                            ),
+                          );
+                        },
+                        text: 'Tujuan\nPembelajaran',
+                        screenHeight: screenHeight,
+                        screenWidth: screenWidth,
+                      ),
+                      SizedBox(height: screenHeight * 0.018),
                       _buildMenuButton(
                         isPressed: _isBelajarPressed,
                         onPressChanged: (v) => setState(() => _isBelajarPressed = v),
@@ -201,7 +240,7 @@ class _MenuScreenState extends State<MenuScreen>
                         screenHeight: screenHeight,
                         screenWidth: screenWidth,
                       ),
-                      SizedBox(height: screenHeight * 0.035),
+                      SizedBox(height: screenHeight * 0.018),
                       _buildMenuButton(
                         isPressed: _isLatihanPressed,
                         onPressChanged: (v) => setState(() => _isLatihanPressed = v),
@@ -213,7 +252,7 @@ class _MenuScreenState extends State<MenuScreen>
                         screenHeight: screenHeight,
                         screenWidth: screenWidth,
                       ),
-                      SizedBox(height: screenHeight * 0.035),
+                      SizedBox(height: screenHeight * 0.018),
                       _buildMenuButton(
                         isPressed: _isHistoriPressed,
                         onPressChanged: (v) => setState(() => _isHistoriPressed = v),
@@ -226,24 +265,7 @@ class _MenuScreenState extends State<MenuScreen>
                             ),
                           );
                         },
-                        text: 'Histori Nilai',
-                        screenHeight: screenHeight,
-                        screenWidth: screenWidth,
-                      ),
-                      SizedBox(height: screenHeight * 0.035),
-                      _buildMenuButton(
-                        isPressed: _isInformasiPressed,
-                        onPressChanged: (v) => setState(() => _isInformasiPressed = v),
-                        onTap: () {
-                          _audio.playButtonSound();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const InformasiScreen(),
-                            ),
-                          );
-                        },
-                        text: 'Informasi',
+                        text: 'Historis Nilai',
                         screenHeight: screenHeight,
                         screenWidth: screenWidth,
                       ),
@@ -381,12 +403,12 @@ class _MenuScreenState extends State<MenuScreen>
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Image.asset('assets/untukmenu/tombolmenu.png', width: screenWidth * 0.28, height: screenHeight * 0.12, fit: BoxFit.fill),
+          Image.asset('assets/untukmenu/tombolmenu.png', width: screenWidth * 0.28, height: screenHeight * 0.105, fit: BoxFit.fill),
           Text(
             text,
             style: TextStyle(
               fontFamily: 'Bangers',
-              fontSize: screenHeight * 0.032,
+              fontSize: screenHeight * 0.027,
               color: Colors.white,
               shadows: const [Shadow(color: Colors.black26, offset: Offset(1, 1), blurRadius: 2)],
             ),
@@ -588,7 +610,7 @@ class _MenuScreenState extends State<MenuScreen>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'LATIHAN',
+                        'Latihan',
                         style: TextStyle(
                           fontFamily: 'Bangers',
                           fontSize: screenHeight * 0.08,
@@ -615,7 +637,7 @@ class _MenuScreenState extends State<MenuScreen>
                             Navigator.pop(context);
                             Navigator.push(context, MaterialPageRoute(builder: (context) => const TebakKataScreen()));
                           },
-                          text: 'Tebak Kata',
+                          text: 'tebak kata',
                           screenHeight: screenHeight,
                           screenWidth: screenWidth,
                         ),
@@ -639,7 +661,7 @@ class _MenuScreenState extends State<MenuScreen>
                             Navigator.pop(context);
                             Navigator.push(context, MaterialPageRoute(builder: (context) => const MenyusunHurufScreen()));
                           },
-                          text: 'Menyusun\nHuruf',
+                          text: 'menyusun\nhuruf',
                           screenHeight: screenHeight,
                           screenWidth: screenWidth,
                         ),
@@ -663,7 +685,7 @@ class _MenuScreenState extends State<MenuScreen>
                             Navigator.pop(context);
                             _showMengucapkanSubmenu(context, screenWidth, screenHeight);
                           },
-                          text: 'Mengucapkan\nKata',
+                          text: 'mengucapkan\nkata',
                           screenHeight: screenHeight,
                           screenWidth: screenWidth,
                         ),
@@ -826,6 +848,7 @@ class _MenuScreenState extends State<MenuScreen>
     required String text,
     required double screenHeight,
     required double screenWidth,
+    String? fontFamily,
   }) {
     return GestureDetector(
       onTapDown: (_) { onPressChanged(true); _audio.playButtonSound(); },
@@ -846,13 +869,43 @@ class _MenuScreenState extends State<MenuScreen>
           child: Text(
             text,
             style: TextStyle(
-              fontFamily: 'Bangers',
-              fontSize: screenHeight * 0.04,
+              fontFamily: fontFamily ?? 'Dimbo',
+              fontSize: screenHeight * 0.042,
+              fontWeight: FontWeight.bold,
               color: Colors.white,
               shadows: const [Shadow(color: Colors.black26, offset: Offset(1, 1), blurRadius: 2)],
             ),
             textAlign: TextAlign.center,
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWAProfileIcon(double size) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: const Color(0xFFCFD8DC),
+        border: Border.all(
+          color: Colors.white,
+          width: size * 0.06,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 4,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Icon(
+          Icons.person,
+          color: Colors.white,
+          size: size * 0.65,
         ),
       ),
     );

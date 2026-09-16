@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'services/audio_service.dart';
 import 'screens/input_name_screen.dart';
+import 'screens/informasi_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,6 +57,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   bool _isPlayPressed = false;
   bool _isMenuPressed = false;
+  bool _isInformasiPressed = false;
   bool _isExitPressed = false;
   bool _isSoundPressed = false;
   bool _isVideoPressed = false;
@@ -129,14 +131,34 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 Positioned(
                   top: screenHeight * 0.03,
                   right: screenWidth * 0.02,
-                  child: _buildAnimatedButton(
-                    isPressed: _isExitPressed,
-                    onPressChanged: (v) => setState(() => _isExitPressed = v),
-                    onTap: () => _showExitDialog(context),
-                    child: Image.asset(
-                      'assets/untukhome/tombol exit.png',
-                      height: screenHeight * 0.12,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildAnimatedButton(
+                        isPressed: _isInformasiPressed,
+                        onPressChanged: (v) => setState(() => _isInformasiPressed = v),
+                        onTap: () {
+                          _audio.playButtonSound();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const InformasiScreen(),
+                            ),
+                          );
+                        },
+                        child: _buildWAProfileIcon(screenHeight * 0.12),
+                      ),
+                      SizedBox(width: screenWidth * 0.015),
+                      _buildAnimatedButton(
+                        isPressed: _isExitPressed,
+                        onPressChanged: (v) => setState(() => _isExitPressed = v),
+                        onTap: () => _showExitDialog(context),
+                        child: Image.asset(
+                          'assets/untukhome/tombol exit.png',
+                          height: screenHeight * 0.12,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Positioned(
@@ -281,6 +303,35 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         scale: isPressed ? 0.85 : 1.0,
         duration: const Duration(milliseconds: 150),
         child: child,
+      ),
+    );
+  }
+
+  Widget _buildWAProfileIcon(double size) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: const Color(0xFFCFD8DC),
+        border: Border.all(
+          color: Colors.white,
+          width: size * 0.06,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 4,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Icon(
+          Icons.person,
+          color: Colors.white,
+          size: size * 0.65,
+        ),
       ),
     );
   }

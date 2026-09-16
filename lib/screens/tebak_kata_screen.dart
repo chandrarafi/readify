@@ -3,6 +3,7 @@ import '../services/audio_service.dart';
 import '../services/score_service.dart';
 import '../models/score_history.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/exercise_intro_banner.dart';
 
 class TebakKataScreen extends StatefulWidget {
   const TebakKataScreen({super.key});
@@ -15,6 +16,7 @@ class _TebakKataScreenState extends State<TebakKataScreen>
     with TickerProviderStateMixin {
   final _audio = AudioService();
   final _scoreService = ScoreService();
+  bool _showIntroBanner = true;
 
   // Data soal tebak kata
   final List<Map<String, dynamic>> _soalList = [
@@ -96,10 +98,16 @@ class _TebakKataScreenState extends State<TebakKataScreen>
     super.initState();
     _soalList.shuffle(); // Acak soal saat mulai
     _initAnimations();
-    // Play audio soal pertama setelah animasi selesai
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      if (mounted) _speakQuestion();
-    });
+    _showIntroBanner = true;
+  }
+
+  void _onIntroBannerFinished() {
+    if (mounted) {
+      setState(() {
+        _showIntroBanner = false;
+      });
+      _speakQuestion();
+    }
   }
 
   Future<void> _speakQuestion() async {
@@ -194,8 +202,8 @@ class _TebakKataScreenState extends State<TebakKataScreen>
       }
     });
 
-    // Auto next setelah 2.5 detik
-    Future.delayed(const Duration(milliseconds: 2500), () {
+    // Auto next setelah 6 detik agar audio selesai sepenuhnya (tambah 1 detik)
+    Future.delayed(const Duration(milliseconds: 6000), () {
       if (mounted) _nextQuestion();
     });
   }
@@ -245,6 +253,7 @@ class _TebakKataScreenState extends State<TebakKataScreen>
       _isCorrect = false;
       _score = 0;
       _gameFinished = false;
+      _showIntroBanner = true;
     });
   }
 
@@ -583,6 +592,15 @@ class _TebakKataScreenState extends State<TebakKataScreen>
                     ),
                   ),
                 ),
+              ),
+            if (_showIntroBanner)
+              ExerciseIntroBanner(
+                title: 'LATIHAN TEBAK KATA',
+                instruction: 'Dengarkan petunjuk kata, lalu pilih gambar jawaban yang tepat!',
+                emoji: '🎯',
+                primaryColor: const Color(0xFFFF7043),
+                audioAsset: 'assets/tebakkata.m4a',
+                onFinished: _onIntroBannerFinished,
               ),
           ],
         ),

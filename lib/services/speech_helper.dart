@@ -149,79 +149,76 @@ class SpeechHelper {
 
         // Cek dan sesuaikan bahasa yang tersedia
         var locales = await _speech.locales();
-        if (locales.isEmpty) {
-          print('SpeechHelper: Tidak ada bahasa yang tersedia');
-          _isListening = false;
-          return false;
-        }
-
-        // Coba beberapa kemungkinan lokal untuk bahasa Indonesia
-        List<String> possibleIndonesianLocales = [
-          'id_ID',
-          'id-ID',
-          'in_ID',
-          'in-ID',
-          'id',
-          'in',
-        ];
-
-        String localeToUse = '';
+        String localeToUse = kIsWeb ? 'id-ID' : 'id_ID';
         bool foundIndonesian = false;
 
-        // Pertama coba cari lokal Indonesia yang cocok persis
-        for (var searchLocale in possibleIndonesianLocales) {
-          for (var locale in locales) {
-            if (locale.localeId == searchLocale) {
-              localeToUse = locale.localeId;
-              foundIndonesian = true;
-              print(
-                'SpeechHelper: Menemukan locale Indonesia yang cocok: $localeToUse',
-              );
-              break;
-            }
-          }
-          if (foundIndonesian) break;
-        }
+        if (locales.isNotEmpty) {
+          // Coba beberapa kemungkinan lokal untuk bahasa Indonesia
+          List<String> possibleIndonesianLocales = [
+            'id_ID',
+            'id-ID',
+            'in_ID',
+            'in-ID',
+            'id',
+            'in',
+          ];
 
-        // Jika tidak ditemukan yang cocok persis, coba cari yang mengandung 'id'
-        if (!foundIndonesian) {
-          for (var locale in locales) {
-            if (locale.localeId.startsWith('id') ||
-                locale.localeId.startsWith('in') ||
-                locale.localeId.contains('_id') ||
-                locale.localeId.contains('_in')) {
-              localeToUse = locale.localeId;
-              foundIndonesian = true;
-              print(
-                'SpeechHelper: Menggunakan locale yang mirip bahasa Indonesia: $localeToUse',
-              );
-              break;
+          // Pertama coba cari lokal Indonesia yang cocok persis
+          for (var searchLocale in possibleIndonesianLocales) {
+            for (var locale in locales) {
+              if (locale.localeId == searchLocale) {
+                localeToUse = locale.localeId;
+                foundIndonesian = true;
+                print(
+                  'SpeechHelper: Menemukan locale Indonesia yang cocok: $localeToUse',
+                );
+                break;
+              }
             }
+            if (foundIndonesian) break;
           }
-        }
 
-        // Jika masih tidak ditemukan, gunakan bahasa Inggris sebagai fallback
-        if (!foundIndonesian || localeToUse.isEmpty) {
-          print(
-            'SpeechHelper: Bahasa Indonesia tidak ditemukan di sistem Windows',
-          );
-          print('SpeechHelper: PERINGATAN - Akan menggunakan bahasa Inggris, hasil mungkin tidak akurat');
-          print('SpeechHelper: Untuk hasil terbaik, install language pack Bahasa Indonesia di Windows');
-          
-          // Cari bahasa Inggris sebagai fallback
-          for (var locale in locales) {
-            if (locale.localeId.startsWith('en')) {
-              localeToUse = locale.localeId;
-              print('SpeechHelper: Menggunakan bahasa Inggris sebagai fallback: $localeToUse');
-              break;
+          // Jika tidak ditemukan yang cocok persis, coba cari yang mengandung 'id'
+          if (!foundIndonesian) {
+            for (var locale in locales) {
+              if (locale.localeId.startsWith('id') ||
+                  locale.localeId.startsWith('in') ||
+                  locale.localeId.contains('_id') ||
+                  locale.localeId.contains('_in')) {
+                localeToUse = locale.localeId;
+                foundIndonesian = true;
+                print(
+                  'SpeechHelper: Menggunakan locale yang mirip bahasa Indonesia: $localeToUse',
+                );
+                break;
+              }
             }
           }
-          
-          // Jika masih kosong, gunakan default sistem
-          if (localeToUse.isEmpty && locales.isNotEmpty) {
-            localeToUse = locales.first.localeId;
-            print('SpeechHelper: Menggunakan bahasa pertama yang tersedia: $localeToUse');
+
+          // Jika masih tidak ditemukan, gunakan bahasa Inggris sebagai fallback
+          if (!foundIndonesian || localeToUse.isEmpty) {
+            print(
+              'SpeechHelper: Bahasa Indonesia tidak ditemukan di sistem',
+            );
+            print('SpeechHelper: PERINGATAN - Akan menggunakan bahasa Inggris, hasil mungkin tidak akurat');
+            
+            // Cari bahasa Inggris sebagai fallback
+            for (var locale in locales) {
+              if (locale.localeId.startsWith('en')) {
+                localeToUse = locale.localeId;
+                print('SpeechHelper: Menggunakan bahasa Inggris sebagai fallback: $localeToUse');
+                break;
+              }
+            }
+            
+            // Jika masih kosong, gunakan default sistem
+            if (localeToUse.isEmpty && locales.isNotEmpty) {
+              localeToUse = locales.first.localeId;
+              print('SpeechHelper: Menggunakan bahasa pertama yang tersedia: $localeToUse');
+            }
           }
+        } else {
+          print('SpeechHelper: Locales list kosong (Web/Browser mode), default ke $localeToUse');
         }
 
         // Catat semua bahasa yang tersedia untuk debugging

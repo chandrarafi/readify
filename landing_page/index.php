@@ -1,0 +1,84 @@
+<?php
+// Set Security Headers
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: SAMEORIGIN");
+header("Referrer-Policy: strict-origin-when-cross-origin");
+?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Readify - Aplikasi Belajar Membaca Interaktif Anak</title>
+  <meta name="description" content="Readify adalah aplikasi edukasi anak untuk belajar mengenal huruf alfabet, membaca kosakata, melatih pengucapan kata dengan suara, dan bermain quiz interaktif.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=50">
+</head>
+<body>
+
+  <!-- Single Hero Section (Ultra Clean) -->
+  <main class="hero" id="hero">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        Belajar Membaca Jadi Lebih <span class="highlight">Seru & Interaktif!</span>
+      </h1>
+
+      <div class="hero-ctas" id="download">
+        <!-- Android APK Button -->
+        <a href="https://cdn.tereliye.my.id/download/readify-android.apk" class="btn-cta btn-apk" id="heroDownloadApk" target="_blank" rel="noopener noreferrer">
+          <svg class="btn-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.552 0 .9997.4482.9997.9993.0001.5511-.4477.9997-.9997.9997zm-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.552 0 .9997.4482.9997.9993 0 .5511-.4477.9997-.9997.9997zm11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1523-.5676.416.416 0 00-.5676.1523l-2.0223 3.503C15.5902 8.354 13.856 8 12 8s-3.5902.354-5.1366.9499L4.8411 5.4469a.416.416 0 00-.5676-.1523.416.416 0 00-.1523.5676l1.9973 3.4592C2.6889 11.0867.348 14.3413.042 18.271h23.916c-.306-3.9297-2.6469-7.1843-6.0765-8.9496z"/>
+          </svg>
+          <div class="btn-meta">
+            <span class="label">Download SiapPakai</span>
+            <span class="title">Android (.APK)</span>
+          </div>
+        </a>
+
+        <!-- Windows EXE Button -->
+        <a href="https://cdn.tereliye.my.id/download/readify-windows.exe" class="btn-cta btn-exe" id="heroDownloadExe" target="_blank" rel="noopener noreferrer">
+          <svg class="btn-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <path d="M0 3.449L9.75 2.1v9.451H0zm10.55-1.509L24 0v11.4H10.55zM0 12.6h9.75v9.451L0 20.701zm10.55 0H24V24l-13.45-1.899z"/>
+          </svg>
+          <div class="btn-meta">
+            <span class="label">Download PC/Laptop</span>
+            <span class="title">Windows (.EXE)</span>
+          </div>
+        </a>
+
+        <!-- Web Version Button -->
+        <a href="app/index.html" class="btn-cta btn-web" id="heroOpenWeb" target="_blank" rel="noopener noreferrer">
+          <svg class="btn-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+          </svg>
+          <div class="btn-meta">
+            <span class="label">Main Tanpa Install</span>
+            <span class="title">Buka Versi Web</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Hero Visual / Mascot -->
+    <div class="hero-visual">
+      <div class="mascot-container">
+        <img src="assets/images/bg_hero.png" alt="Hero Background" class="mascot-bg">
+        <img src="assets/images/karakter_laki.png" alt="Karakter Laki-laki" class="mascot-img-1">
+        <img src="assets/images/karakter_perempuan.png" alt="Karakter Perempuan" class="mascot-img-2">
+        
+        <div class="floating-chips">
+          <div class="chip chip-1">A</div>
+          <div class="chip chip-2">B</div>
+          <div class="chip chip-3">C</div>
+          <div class="chip chip-4">D</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>

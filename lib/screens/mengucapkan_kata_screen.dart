@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import '../services/speech_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +9,7 @@ import '../services/audio_service.dart';
 import '../services/score_service.dart';
 import '../models/score_history.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../widgets/exercise_intro_banner.dart';
 
 class MengucapkanKataScreen extends StatefulWidget {
   final String category; // 'KV-KV' atau 'KV-KVK'
@@ -27,6 +29,7 @@ class _MengucapkanKataScreenState extends State<MengucapkanKataScreen>
   final _scoreService = ScoreService();
   final SpeechHelper _speechHelper = SpeechHelper();
   final FlutterTts _flutterTts = FlutterTts();
+  bool _showIntroBanner = true;
 
 
   // Daftar soal
@@ -102,11 +105,16 @@ class _MengucapkanKataScreenState extends State<MengucapkanKataScreen>
     _initAnimations();
     _initSpeech();
     _initTts();
+    _showIntroBanner = true;
+  }
 
-    // Play audio soal pertama setelah halaman terbuka
-    Future.delayed(const Duration(milliseconds: 1200), () {
-      if (mounted) _playWordSound(_currentWord);
-    });
+  void _onIntroBannerFinished() {
+    if (mounted) {
+      setState(() {
+        _showIntroBanner = false;
+      });
+      _playWordSound(_currentWord);
+    }
   }
 
   void _initAnimations() {
@@ -249,6 +257,7 @@ class _MengucapkanKataScreenState extends State<MengucapkanKataScreen>
 
   // Request microphone permission
   Future<bool> _requestMicrophonePermission() async {
+    if (kIsWeb) return true;
     try {
       // Cek status permission saat ini
       PermissionStatus status = await Permission.microphone.status;
@@ -698,26 +707,28 @@ class _MengucapkanKataScreenState extends State<MengucapkanKataScreen>
   void _startListening() async {
     debugPrint('_startListening called');
     
-    // Cek permission microphone
-    PermissionStatus micStatus = await Permission.microphone.status;
-    debugPrint('Microphone permission status: $micStatus');
-    
-    if (!micStatus.isGranted) {
-      // Request permission
-      bool granted = await _requestMicrophonePermission();
-      if (!granted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Izin microphone diperlukan untuk menggunakan fitur ini.',
-              style: TextStyle(fontFamily: 'Roboto'),
+    // Cek permission microphone (pada Web ditangani langsung oleh browser Web Speech API)
+    if (!kIsWeb) {
+      PermissionStatus micStatus = await Permission.microphone.status;
+      debugPrint('Microphone permission status: $micStatus');
+      
+      if (!micStatus.isGranted) {
+        // Request permission
+        bool granted = await _requestMicrophonePermission();
+        if (!granted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Izin microphone diperlukan untuk menggunakan fitur ini.',
+                style: TextStyle(fontFamily: 'Roboto'),
+              ),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
             ),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 3),
-          ),
-        );
-        _showPermissionDeniedDialog();
-        return;
+          );
+          _showPermissionDeniedDialog();
+          return;
+        }
       }
     }
     
@@ -895,17 +906,19 @@ class _MengucapkanKataScreenState extends State<MengucapkanKataScreen>
 
     if (correct) {
       _audio.playCorrectSound();
-      Future.delayed(const Duration(milliseconds: 2000), () async {
-        if (!mounted) return;
-        await _resultController.reverse();
-        setState(() {
-          _showPopup = false;
-        });
-        _nextQuestion();
-      });
     } else {
       _audio.playWrongSound();
     }
+
+    // Tampilkan feedback selama 6 detik (tambah 1 detik)
+    Future.delayed(const Duration(milliseconds: 6000), () async {
+      if (!mounted) return;
+      await _resultController.reverse();
+      setState(() {
+        _showPopup = false;
+      });
+      _nextQuestion();
+    });
   }
 
   void _nextQuestion() {
@@ -951,9 +964,7 @@ class _MengucapkanKataScreenState extends State<MengucapkanKataScreen>
       _lastWords = '';
       _showPopup = false;
       _speechStatus = 'Tekan tombol mic lalu ucapkan kata';
-    });
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) _playWordSound(_currentWord);
+      _showIntroBanner = true;
     });
   }
 
@@ -1146,6 +1157,16 @@ class _MengucapkanKataScreenState extends State<MengucapkanKataScreen>
 
             // Feedback Overlay Popup
             if (_showPopup) _buildResultFeedback(sw, sh),
+
+            if (_showIntroBanner)
+              ExerciseIntroBanner(
+                title: 'LATIHAN MENGUCAPKAN KATA',
+                instruction: 'Dengarkan kata, lalu tekan tombol mikrofon dan ucapkan dengan jelas!',
+                emoji: '🎤',
+                primaryColor: const Color(0xFF26A69A),
+                audioAsset: 'assets/mengucapkan.m4a',
+                onFinished: _onIntroBannerFinished,
+              ),
           ],
         ),
       ),
@@ -1184,46 +1205,43 @@ class _MengucapkanKataScreenState extends State<MengucapkanKataScreen>
                   ),
                 ),
                 SizedBox(height: sh * 0.02),
-                // Suku kata berkotak 3D
+                // Per-huruf satu kotak (seperti latihan menyusun huruf)
                 Wrap(
                   alignment: WrapAlignment.center,
                   crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: sw * 0.015,
+                  spacing: sw * 0.01,
                   runSpacing: sh * 0.01,
                   children: [
                     ...List.generate(
-                      (_currentSoal['suku'] as List<String>).length,
+                      _currentWord.length,
                       (index) {
-                        final suku = (_currentSoal['suku'] as List<String>)[index];
-                        final color = _syllableColors[index % _syllableColors.length];
-                        return _buildSyllableBox(suku, color, sw, sh);
+                        final letter = _currentWord[index];
+                        return _buildLetterBox(letter, index, sw, sh);
                       },
                     ),
-                    // Speaker button next to syllables
+                    SizedBox(width: sw * 0.01),
+                    // Speaker button next to letter boxes
                     _buildSpeakerButton(sh),
                   ],
                 ),
                 SizedBox(height: sh * 0.02),
-                // Speech Status / Instructions
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: sw * 0.02,
-                    vertical: sh * 0.008,
+                // Speech Status / Instructions (Plain enlarged text without card container)
+                Text(
+                  _speechStatus,
+                  style: TextStyle(
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.w900,
+                    fontSize: sh * 0.038,
+                    color: _isListening ? Colors.red.shade700 : Colors.brown.shade900,
+                    shadows: const [
+                      Shadow(
+                        color: Colors.white,
+                        offset: Offset(1, 1),
+                        blurRadius: 2,
+                      ),
+                    ],
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    _speechStatus,
-                    style: TextStyle(
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.bold,
-                      fontSize: sh * 0.02,
-                      color: _isListening ? Colors.red.shade700 : Colors.brown.shade700,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                  textAlign: TextAlign.center,
                 ),
                 SizedBox(height: sh * 0.02),
                 // Transcribed text bubble
@@ -1250,35 +1268,57 @@ class _MengucapkanKataScreenState extends State<MengucapkanKataScreen>
 
 
 
-  Widget _buildSyllableBox(String suku, Color color, double sw, double sh) {
+  int _letterToIndex(String letter) {
+    return letter.toLowerCase().codeUnitAt(0) - 'a'.codeUnitAt(0);
+  }
+
+  Widget _buildLetterBox(String letter, int index, double sw, double sh) {
+    final boxSize = sh * 0.14;
+    final List<Color> colors = [
+      Colors.orange.shade400,
+      Colors.blue.shade400,
+      Colors.green.shade400,
+      Colors.purple.shade400,
+      Colors.red.shade400,
+    ];
+    final Color color = colors[index % colors.length];
+
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: sw * 0.008),
-      padding: EdgeInsets.symmetric(
-        horizontal: sw * 0.02,
-        vertical: sh * 0.015,
-      ),
+      width: boxSize,
+      height: boxSize,
+      margin: EdgeInsets.symmetric(horizontal: sw * 0.006),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [color.withValues(alpha: 0.9), color],
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 2),
+        color: color,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white, width: 3.5),
         boxShadow: [
-          BoxShadow(color: color.withValues(alpha: 0.8), offset: const Offset(0, 4), blurRadius: 0),
-          const BoxShadow(color: Colors.black26, offset: Offset(0, 6), blurRadius: 6),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            offset: const Offset(0, 5),
+            blurRadius: 0,
+          ),
+          const BoxShadow(
+            color: Colors.black26,
+            offset: Offset(0, 7),
+            blurRadius: 7,
+          ),
         ],
       ),
-      child: Text(
-        suku.toUpperCase(),
-        style: TextStyle(
-          fontFamily: 'Bangers',
-          fontSize: sh * 0.04,
-          color: Colors.white,
-          shadows: const [
-            Shadow(color: Colors.black38, offset: Offset(1, 1), blurRadius: 2),
-          ],
+      child: Center(
+        child: Image.asset(
+          'assets/untukbelajar/alfabet/abc besar_${_letterToIndex(letter)}.png',
+          height: boxSize * 0.75,
+          errorBuilder: (c, e, s) => Text(
+            letter.toUpperCase(),
+            style: TextStyle(
+              fontFamily: 'Bangers',
+              fontSize: sh * 0.075,
+              color: Colors.white,
+              shadows: const [
+                Shadow(color: Colors.black38, offset: Offset(1.5, 1.5), blurRadius: 3),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -1288,15 +1328,15 @@ class _MengucapkanKataScreenState extends State<MengucapkanKataScreen>
     return GestureDetector(
       onTap: () => _playWordSound(_currentWord),
       child: Container(
-        padding: EdgeInsets.all(sh * 0.012),
+        padding: EdgeInsets.all(sh * 0.016),
         decoration: BoxDecoration(
           color: Colors.orange.shade400,
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2),
+          border: Border.all(color: Colors.white, width: 3),
           boxShadow: [
             BoxShadow(
               color: Colors.orange.shade700,
-              offset: const Offset(0, 3),
+              offset: const Offset(0, 4),
               blurRadius: 0,
             ),
           ],
@@ -1304,7 +1344,7 @@ class _MengucapkanKataScreenState extends State<MengucapkanKataScreen>
         child: Icon(
           Icons.volume_up_rounded,
           color: Colors.white,
-          size: sh * 0.03,
+          size: sh * 0.042,
         ),
       ),
     );

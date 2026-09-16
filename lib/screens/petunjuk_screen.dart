@@ -108,7 +108,7 @@ class _PetunjukScreenState extends State<PetunjukScreen>
           ),
           TourStep(
             targetKey: _menuKeyHistori,
-            title: 'Histori Nilai',
+            title: 'Historis Nilai',
             description:
                 'Lihat semua nilai dari kuis yang pernah kamu kerjakan. Pantau apakah nilaimu semakin meningkat!',
             emoji: '⭐',

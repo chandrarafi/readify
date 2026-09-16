@@ -221,11 +221,9 @@ class _TourOverlayState extends State<TourOverlay>
         : null;
     final tooltipBottom = !showBelow 
         ? screenHeight - rect.top + 12 
-        : null;
-
-    // Horizontal position: centered on target, clamped to screen
-    double tooltipLeft = rect.center.dx - (screenWidth * 0.4) / 2;
-    tooltipLeft = tooltipLeft.clamp(12.0, screenWidth - screenWidth * 0.4 - 12);
+        : null;    // Horizontal position: centered on target, clamped to screen
+    double tooltipLeft = rect.center.dx - (screenWidth * 0.48) / 2;
+    tooltipLeft = tooltipLeft.clamp(12.0, screenWidth - screenWidth * 0.48 - 12);
 
     return Positioned(
       top: tooltipTop,
@@ -237,7 +235,7 @@ class _TourOverlayState extends State<TourOverlay>
           scale: _tooltipScale,
           alignment: showBelow ? Alignment.topCenter : Alignment.bottomCenter,
           child: Container(
-            width: screenWidth * 0.4,
+            width: screenWidth * 0.48,
             padding: EdgeInsets.all(screenWidth * 0.03),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -264,17 +262,17 @@ class _TourOverlayState extends State<TourOverlay>
                   children: [
                     Text(
                       step.emoji,
-                      style: TextStyle(fontSize: screenHeight * 0.03),
+                      style: TextStyle(fontSize: screenHeight * 0.045),
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         step.title,
                         style: TextStyle(
-                          fontFamily: 'SpicySale',
-                          fontSize: screenHeight * 0.025,
+                          fontFamily: 'Bangers',
+                          fontSize: screenHeight * 0.038,
                           color: step.color,
-                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.1,
                         ),
                       ),
                     ),
@@ -282,32 +280,33 @@ class _TourOverlayState extends State<TourOverlay>
                     GestureDetector(
                       onTap: _finish,
                       child: Container(
-                        padding: EdgeInsets.all(4),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: Colors.grey.shade200,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.close,
-                          size: screenHeight * 0.02,
+                          size: screenHeight * 0.025,
                           color: Colors.grey.shade600,
                         ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: screenHeight * 0.01),
+                SizedBox(height: screenHeight * 0.012),
 
-                // Description
+                // Description (Diperbesar sesuai permintaan)
                 Text(
                   step.description,
                   style: TextStyle(
-                    fontSize: screenHeight * 0.018,
-                    color: Colors.grey.shade700,
-                    height: 1.4,
+                    fontSize: screenHeight * 0.026,
+                    color: Colors.grey.shade900,
+                    fontWeight: FontWeight.w500,
+                    height: 1.35,
                   ),
                 ),
-                SizedBox(height: screenHeight * 0.015),
+                SizedBox(height: screenHeight * 0.018),
 
                 // Navigation row
                 Row(
@@ -315,18 +314,18 @@ class _TourOverlayState extends State<TourOverlay>
                   children: [
                     // Step counter
                     Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: step.color.withValues(alpha: 0.1),
+                        color: step.color.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         '${_currentStep + 1} / ${widget.steps.length}',
                         style: TextStyle(
-                          fontSize: screenHeight * 0.015,
+                          fontSize: screenHeight * 0.022,
                           color: step.color,
                           fontWeight: FontWeight.bold,
                         ),
@@ -345,10 +344,10 @@ class _TourOverlayState extends State<TourOverlay>
                             step: step,
                             screenHeight: screenHeight,
                           ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         _buildNavBtn(
                           icon: _currentStep == widget.steps.length - 1
-                              ? Icons.check_rounded
+                              ? Icons.check_circle_rounded
                               : Icons.arrow_forward_rounded,
                           label: _currentStep == widget.steps.length - 1
                               ? 'Selesai'
@@ -381,7 +380,7 @@ class _TourOverlayState extends State<TourOverlay>
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: isPrimary ? step.color : Colors.grey.shade100,
           borderRadius: BorderRadius.circular(12),
@@ -399,19 +398,19 @@ class _TourOverlayState extends State<TourOverlay>
           mainAxisSize: MainAxisSize.min,
           children: [
             if (!isPrimary)
-              Icon(icon, size: screenHeight * 0.016, color: Colors.grey.shade600),
-            if (!isPrimary) SizedBox(width: 4),
+              Icon(icon, size: screenHeight * 0.022, color: Colors.grey.shade600),
+            if (!isPrimary) const SizedBox(width: 4),
             Text(
               label,
               style: TextStyle(
-                fontSize: screenHeight * 0.016,
+                fontSize: screenHeight * 0.022,
                 color: isPrimary ? Colors.white : Colors.grey.shade600,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            if (isPrimary) SizedBox(width: 4),
+            if (isPrimary) const SizedBox(width: 4),
             if (isPrimary)
-              Icon(icon, size: screenHeight * 0.016, color: Colors.white),
+              Icon(icon, size: screenHeight * 0.022, color: Colors.white),
           ],
         ),
       ),
